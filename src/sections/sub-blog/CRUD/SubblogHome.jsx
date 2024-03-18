@@ -1,6 +1,7 @@
 /* eslint-disable react/button-has-type */
-import React, { useState } from 'react';
+import { Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -8,12 +9,22 @@ import { Button } from '@mui/material';
 
 import Iconify from 'src/components/iconify/iconify';
 
-import { subblogList } from './Data';
-import { deleteSubblog } from './SubblogReducer';
+import { getsubBlogs, deleteSubblog } from './SubblogReducer';
 
 function SubblogHome() {
-  const subblogs = useSelector((state) => state.subblogs);
+  const subBlogsState = useSelector((state) => state.subBlogs);
+
+  console.log(`sub-blog state`);
+  console.log(subBlogsState);
+
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (subBlogsState.status === 'idle') {
+      dispatch(getsubBlogs());
+    }
+  }, [subBlogsState.status, dispatch]);
+
   const navigate = useNavigate();
   // eslint-disable-next-line no-unused-vars
   const [img, setImage] = useState(null);
@@ -37,23 +48,17 @@ function SubblogHome() {
     }
   };
 
-  return (
-    <div className='container'>
-      <h2>Sub-Category Page</h2>
-      <Button
-        variant="contained"
-        color="primary"
-        component={Link}
-        to="/SubblogCreate"
-        startIcon={<Iconify icon="eva:plus-fill" />}
-      >
-        Create
-      </Button>
-      {/* Display the wide screen screenshot using blogs.img */}
-      {subblogs && subblogs.length > 0 && (
-        <img src={subblogs[0].img} alt="Wide Screen Screenshot" style={{ width: '100%' }} />
-      )}
-      <table className='table'>
+  let content;
+  if (subBlogsState.loading) {
+    // eslint-disable-next-line react/jsx-no-undef
+    content = <Spinner text="loading" />;
+  } else if (subBlogsState.status === 'rejected') {
+    content = <h2> error in fetching data {subBlogsState.error}</h2>;
+  } else {
+    const { subBlogs } = subBlogsState;
+    console.log(subBlogs);
+    content = (
+      <table className="table">
         <thead>
           <tr>
             <th>ID</th>
@@ -64,37 +69,60 @@ function SubblogHome() {
           </tr>
         </thead>
         <tbody>
-        {subblogList && subblogList.map((subblog) => (
-    <tr key={subblog.id}>
-    <td>{subblog.id}</td>
-    <td>{subblog.name}</td>
-    <td>
-      {/* Display uploaded image or placeholder */}
-      {subblog.img ? (
-        <img src={subblog.img} alt="Uploaded" style={{ maxWidth: '100px' }} />
-      ) : (
-        <input type="file" accept="image/*" onChange={handleImageUpload} />
-      )}
-    </td>
-    <td>{subblog.categoryId}</td>
-    <td>
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-        {/* <Link to={`/BlogUpdate/${blogList.id}`} className='btn btn-sm btn-primary'>Edit</Link> */}
-        <Link to={`/SubblogUpdate/${subblog.id}`} className='btn btn-sm btn-primary'>Edit</Link>
+          {subBlogs &&
+            subBlogs.map((subblog) => (
+              <tr key={subblog._id}>
+                <td>{subblog._id}</td>
+                <td>{subblog.name}</td>
+                <td>
+                  {/* Display uploaded image or placeholder */}
+                  {subblog.image ? (
+                    <img
+                      src={subblog.image.secure_url}
+                      alt="Uploaded"
+                      style={{ maxWidth: '100px' }}
+                    />
+                  ) : (
+                    <input type="file" accept="image/*" onChange={handleImageUpload} />
+                  )}
+                </td>
+                <td>{subblog.categoryId._id}</td>
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    {/* <Link to={`/BlogUpdate/${blogList.id}`} className='btn btn-sm btn-primary'>Edit</Link> */}
+                    <Link to={`/SubblogUpdate/${subblog._id}`} className="btn btn-sm btn-primary">
+                      Edit
+                    </Link>
 
-        <button 
-        onClick={()=>handleDelete(subblog.id)} 
-        className='btn btn-sm btn-danger ms-2'
-        >Delete
-        </button>
-    </div>
-
-    </td>
-  </tr>
-))}
-
+                    <button
+                      onClick={() => handleDelete(subblog._id)}
+                      className="btn btn-sm btn-danger ms-2"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
+    );
+  }
+
+  return (
+    <div className="container">
+      <h2>Sub-Category Page</h2>
+      <Button
+        variant="contained"
+        color="primary"
+        component={Link}
+        to="/SubblogCreate"
+        startIcon={<Iconify icon="eva:plus-fill" />}
+      >
+        Create
+      </Button>
+
+      {content}
     </div>
   );
 }

@@ -38,8 +38,8 @@ function ProductHome() {
   };
 
   return (
-    <div className='container'>
-      <h2>Products</h2>
+    <div className="container">
+      <h2>Products Page</h2>
       <Button
         variant="contained"
         color="primary"
@@ -49,11 +49,7 @@ function ProductHome() {
       >
         Create
       </Button>
-      {/* Display the wide screen screenshot using blogs.img */}
-      {products.products && products.products.length > 0 && (
-        <img src={products[0].primImg} alt="Wide Screen Screenshot" style={{ width: '100%' }} />
-      )}
-      <table className='table'>
+      <table className="table">
         <thead>
           <tr>
             <th>ID</th>
@@ -72,43 +68,45 @@ function ProductHome() {
           </tr>
         </thead>
         <tbody>
-        {productList && productList.map((product) => (
-    <tr key={product.id}>
-    <td>{product.id}</td>
-    <td>{product.name}</td>
-    <td>
-      {/* Display uploaded image or placeholder */}
-      {product.primImg ? (
-        <img src={product.primImg} alt="Uploaded" style={{ maxWidth: '100px' }} />
-      ) : (
-        <input type="file" accept="image/*" onChange={handleImageUpload} />
-      )}
-    </td>
-    <td>{product.price}</td>
-    <td>{product.stock}</td>
-    <td>{product.categoryId}</td>
-    <td>{product.subCategoryId}</td>
-    {/* <td>{product.discount}</td> */}
-    <td>{product.size}</td>
-    <td>{product.color}</td>
-    {/* <td>{product.finalPrice}</td> */}
-    {/* <td>{product.description}</td> */}
-    <td>
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-        {/* <Link to={`/BlogUpdate/${blogList.id}`} className='btn btn-sm btn-primary'>Edit</Link> */}
-        <Link to={`/ProductUpdate/${product.id}`} className='btn btn-sm btn-primary'>Edit</Link>
+          {productList &&
+            productList.map((product) => (
+              <tr key={product.id}>
+                <td>{product.id}</td>
+                <td>{product.name}</td>
+                <td>
+                  {/* Display uploaded image or placeholder */}
+                  {product.primImg ? (
+                    <img src={product.primImg} alt="Uploaded" style={{ maxWidth: '100px' }} />
+                  ) : (
+                    <input type="file" accept="image/*" onChange={handleImageUpload} />
+                  )}
+                </td>
+                <td>{product.price}</td>
+                <td>{product.stock}</td>
+                <td>{product.categoryId}</td>
+                <td>{product.subCategoryId}</td>
+                {/* <td>{product.discount}</td> */}
+                <td>{product.size}</td>
+                <td>{product.color}</td>
+                {/* <td>{product.finalPrice}</td> */}
+                {/* <td>{product.description}</td> */}
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    {/* <Link to={`/BlogUpdate/${blogList.id}`} className='btn btn-sm btn-primary'>Edit</Link> */}
+                    <Link to={`/ProductUpdate/${product.id}`} className="btn btn-sm btn-primary">
+                      Edit
+                    </Link>
 
-        <button 
-        onClick={()=>handleDelete(product.id)} 
-        className='btn btn-sm btn-danger ms-2'
-        >Delete
-        </button>
-    </div>
-
-    </td>
-  </tr>
-))}
-
+                    <button
+                      onClick={() => handleDelete(product.id)}
+                      className="btn btn-sm btn-danger ms-2"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
     </div>
