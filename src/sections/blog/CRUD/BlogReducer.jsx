@@ -1,70 +1,93 @@
-import { createSlice } from "@reduxjs/toolkit";
+import axios from 'axios';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-import { blogList } from "./Data";
+const baseUrl = import.meta.env.VITE_BASE_API_URL;
+
+// eslint-disable-next-line arrow-body-style
+export const getBlogs = createAsyncThunk('blogs/getBlogs', () => {
+  const token = import.meta.env.VITE_BASE_JWT_TOKEN;
+
+  return axios
+    .get(`${baseUrl}/category`, {
+      headers: {
+        Authorization: token,
+      },
+    })
+    .then((res) => res.data.categories);
+});
+
+export const updateBlog = createAsyncThunk('brands/updateBlog', ({ id, name, img }) => {
+  // eslint-disable-next-line no-debugger
+  debugger;
+
+  const token = import.meta.env.VITE_BASE_JWT_TOKEN;
+
+  const formData = new FormData();
+  formData.append('name', name);
+  if (img !== null) {
+    formData.append('file', img);
+  }
+
+  const headers = {
+    'Content-Type': 'multipart/form-data',
+    Authorization: token,
+  };
+
+  const config = {
+    method: 'put',
+    url: `${baseUrl}/category/${id}`,
+    headers,
+    data: formData,
+  };
+
+  console.log(config);
+
+  // Send the request using Axios
+  axios(config)
+    .then((response) => {
+      console.log('Response:', response);
+    })
+    .catch((error) => {
+      console.log('Error:', error);
+    });
+});
+
+const initialState = {
+  blogs: [],
+  loading: false,
+  status: 'idle',
+  error: null,
+};
 
 const blogSlice = createSlice({
-    name: "blogs",
-    initialState: blogList,
-    reducers: {
-        addBlog: (state, action) => {
-            state.push(action.payload); 
-        },
-        // uu stands for user update and we use it as nonstorageable var
-        updateBlog: (state, action) => {
-            const {id,name,img} = action.payload;
-            // eslint-disable-next-line eqeqeq
-            const uu = state.find(blog => blog.id == id);
-            if(uu){
-                uu.name = name ;
-                uu.img = img;
-            }
-        },
-        // eslint-disable-next-line consistent-return
-        deleteBlog: (state, action) => {
-            const { id } = action.payload;
-            console.log('Deleting blog with ID:', id); 
-            const index = state.findIndex(blog => blog.id === id);
-            if (index !== -1) {
-                state.splice(index, 1);
-            }
-        }
-        
-    }
+  name: 'blogs',
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder.addCase(updateBlog.fulfilled, (state) => {
+      state.status = 'idle';
+    });
+    builder.addCase(getBlogs.pending, (state) => {
+      state.loading = true;
+      state.status = 'working';
+      console.log('loading now is true');
+    });
+    builder.addCase(getBlogs.fulfilled, (state, action) => {
+      state.loading = false;
+      console.log('loading now is true fulfilled');
+      state.status = 'fulfilled';
+      state.blogs = action.payload;
+    });
+    builder.addCase(getBlogs.rejected, (state, action) => {
+      state.loading = false;
+      state.blogs = [];
+      state.status = 'rejected';
+      console.log('loading now is false rejected');
+      state.error = action.error.message;
+    });
+  },
 });
-export const {addBlog, updateBlog, deleteBlog} = blogSlice.actions;
+
+export const { addBlog, deleteBlog } = blogSlice.actions;
+export const selectAllBlogs = (state) => state.blogs;
 export default blogSlice.reducer;
-
-
-
-// import { createSlice } from "@reduxjs/toolkit";
-
-// import { blogList } from "./Data";
-
-// const blogSlice = createSlice({
-//     name: "blogs",
-//     initialState: blogList,
-//     reducers: {
-//         addBlog: (state, action) => {
-//             state.push(action.payload); 
-//         },
-//         updateBlog: (state, action) => {
-//             const { id, name, img } = action.payload;
-//             const blogToUpdate = state.find(blog => blog.id === id);
-//             if (blogToUpdate) {
-//                 blogToUpdate.name = name;
-//                 blogToUpdate.img = img;
-//             }
-//         },
-//         deleteBlog: (state, action) => {
-//             const { id } = action.payload;
-//             // Modify the state directly
-//             const index = state.findIndex(blog => blog.id === id);
-//             if (index !== -1) {
-//                 state.splice(index, 1);
-//             }
-//         }
-//     }
-// });
-
-// export const { addBlog, updateBlog, deleteBlog } = blogSlice.actions;
-// export default blogSlice.reducer;

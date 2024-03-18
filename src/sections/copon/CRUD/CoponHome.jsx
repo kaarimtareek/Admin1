@@ -1,9 +1,7 @@
 /* eslint-disable react/button-has-type */
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
+import { Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-// import { DatePicker } from 'react-datepicker';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import 'react-datepicker/dist/react-datepicker.css'
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -11,38 +9,89 @@ import { Button } from '@mui/material';
 
 import Iconify from 'src/components/iconify/iconify';
 
-import { coponList } from './Data';
-import { deleteCopon } from './CoponReducer';
+import { getCoupons, deleteCoupon } from './CoponReducer';
 
-function CoponHome() {
-  const copons = useSelector((state) => state.copons);
+function CouponHome() {
+  const couponState = useSelector((state) => state.coupons);
+
+  console.log(`coupon state`);
+  console.log(couponState);
+
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (couponState.status === 'idle') {
+      dispatch(getCoupons());
+    }
+  }, [couponState.status, dispatch]);
+
   const navigate = useNavigate();
-  // eslint-disable-next-line no-unused-vars
-  const [img, setImage] = useState(null);
 
   const handleDelete = (id) => {
-    console.log('Deleting Coupon with ID:', id);
-    dispatch(deleteCopon({ id }));
-    navigate('/CoponHome');
+    console.log('Deleting coupon with ID:', id);
+    dispatch(deleteCoupon({ id }));
+    navigate('/CouponHome');
   };
 
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    const reader = new FileReader();
+  function convertUtcToLocal(utcTimeString) {
+    const utcDate = new Date(utcTimeString);
+    const localDate = new Date(utcDate.getTime() + utcDate.getTimezoneOffset() * 60000);
+    return localDate.toLocaleString(); // Adjust options as needed
+  }
 
-    reader.onloadend = () => {
-      setImage(reader.result);
-    };
+  let content;
+  if (couponState.loading) {
+    // eslint-disable-next-line react/jsx-no-undef
+    content = <Spinner text="loading" />;
+  } else if (couponState.status === 'rejected') {
+    content = <h2> error in fetching data {couponState.error}</h2>;
+  } else {
+    const { coupons } = couponState;
+    console.log(coupons);
+    content = (
+      <table className="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Expire In</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {coupons &&
+            coupons.map((coupon) => (
+              <tr key={coupon._id}>
+                <td>{coupon._id}</td>
+                <td>{coupon.name}</td>
+                <td>{coupon.amount}</td>
+                <td>{convertUtcToLocal(coupon.expireIn)}</td>
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    {/* <Link to={`/CouponUpdate/${couponList.id}`} className='btn btn-sm btn-primary'>Edit</Link> */}
+                    <Link to={`/CoponUpdate/${coupon._id}`} className="btn btn-sm btn-primary">
+                      Edit
+                    </Link>
 
-    if (file) {
-      reader.readAsDataURL(file);
-    }
-  };
+                    <button
+                      onClick={() => handleDelete(coupon._id)}
+                      className="btn btn-sm btn-danger ms-2"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+    );
+  }
 
   return (
-    <div className='container'>
-      <h2>Coupons</h2>
+    <div className="container">
+      <h2>Coupons Page</h2>
       <Button
         variant="contained"
         color="primary"
@@ -52,56 +101,10 @@ function CoponHome() {
       >
         Create
       </Button>
-      {/* Display the wide screen screenshot using blogs.img */}
-      {copons && copons.length > 0 && (
-        <img src={copons[0].img} alt="Wide Screen Screenshot" style={{ width: '100%' }} />
-      )}
-      <table className='table'>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Amount</th>
-            <th>Expire Date</th>
-            <th>Image</th>
-          </tr>
-        </thead>
-        <tbody>
-        {coponList && coponList.map((copon) => (
-    <tr key={copon.id}>
-    <td>{copon.id}</td>
-    <td>{copon.name}</td>
-    <td>{copon.amount}</td>
-    <td>{copon.expireDate}</td>
-    <td>
-      {/* Display uploaded image or placeholder */}
-      {copon.img ? (
-        <img src={copon.img} alt="Uploaded" style={{ maxWidth: '100px' }} />
-      ) : (
-        <input type="file" accept="image/*" onChange={handleImageUpload} />
-      )}
-    </td>
 
-    <td>
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-        {/* <Link to={`/BlogUpdate/${blogList.id}`} className='btn btn-sm btn-primary'>Edit</Link> */}
-        <Link to={`/CoponUpdate/${copon.id}`} className='btn btn-sm btn-primary'>Edit</Link>
-
-        <button 
-        onClick={()=>handleDelete(copon.id)} 
-        className='btn btn-sm btn-danger ms-2'
-        >Delete
-        </button>
-    </div>
-
-    </td>
-  </tr>
-))}
-
-        </tbody>
-      </table>
+      {content}
     </div>
   );
 }
 
-export default CoponHome;
+export default CouponHome;

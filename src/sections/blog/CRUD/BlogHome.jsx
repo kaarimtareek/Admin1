@@ -1,6 +1,7 @@
 /* eslint-disable react/button-has-type */
-import React, { useState } from 'react';
+import { Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -8,12 +9,22 @@ import { Button } from '@mui/material';
 
 import Iconify from 'src/components/iconify/iconify';
 
-import { blogList } from './Data';
-import { deleteBlog } from './BlogReducer';
+import { getBlogs, deleteBlog } from './BlogReducer';
 
 function BlogHome() {
-  const blogs = useSelector((state) => state.blogs);
+  const blogsState = useSelector((state) => state.blogs);
+
+  console.log(`blog state`);
+  console.log(blogsState);
+
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (blogsState.status === 'idle') {
+      dispatch(getBlogs());
+    }
+  }, [blogsState.status, dispatch]);
+  
   const navigate = useNavigate();
   // eslint-disable-next-line no-unused-vars
   const [img, setImage] = useState(null);
@@ -37,8 +48,63 @@ function BlogHome() {
     }
   };
 
+  let content;
+  if (blogsState.loading) {
+    // eslint-disable-next-line react/jsx-no-undef
+    content = <Spinner text="loading" />;
+  } else if (blogsState.status === 'rejected') {
+    content = <h2> error in fetching data {blogsState.error}</h2>;
+  } else {
+    const { blogs } = blogsState;
+    console.log(blogs);
+    content = (
+      <table className="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Image</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {blogs &&
+            blogs.map((blog) => (
+              <tr key={blog._id}>
+                <td>{blog._id}</td>
+                <td>{blog.name}</td>
+                <td>
+                  {/* Display uploaded image or placeholder */}
+                  {blog.image ? (
+                    <img src={blog.image.secure_url} alt="Uploaded" style={{ maxWidth: '100px' }} />
+                  ) : (
+                    <input type="file" accept="image/*" onChange={handleImageUpload} />
+                  )}
+                </td>
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    {/* <Link to={`/BlogUpdate/${blogList.id}`} className='btn btn-sm btn-primary'>Edit</Link> */}
+                    <Link to={`/BlogUpdate/${blog._id}`} className="btn btn-sm btn-primary">
+                      Edit
+                    </Link>
+
+                    <button
+                      onClick={() => handleDelete(blog._id)}
+                      className="btn btn-sm btn-danger ms-2"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+    );
+  }
+
   return (
-    <div className='container'>
+    <div className="container">
       <h2>Category Page</h2>
       <Button
         variant="contained"
@@ -49,50 +115,8 @@ function BlogHome() {
       >
         Create
       </Button>
-      {/* Display the wide screen screenshot using blogs.img */}
-      {blogs && blogs.length > 0 && (
-        <img src={blogs[0].img} alt="Wide Screen Screenshot" style={{ width: '100%' }} />
-      )}
-      <table className='table'>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Image</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-        {blogList && blogList.map((blog) => (
-    <tr key={blog.id}>
-    <td>{blog.id}</td>
-    <td>{blog.name}</td>
-    <td>
-      {/* Display uploaded image or placeholder */}
-      {blog.img ? (
-        <img src={blog.img} alt="Uploaded" style={{ maxWidth: '100px' }} />
-      ) : (
-        <input type="file" accept="image/*" onChange={handleImageUpload} />
-      )}
-    </td>
-    <td>
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-        {/* <Link to={`/BlogUpdate/${blogList.id}`} className='btn btn-sm btn-primary'>Edit</Link> */}
-        <Link to={`/BlogUpdate/${blog.id}`} className='btn btn-sm btn-primary'>Edit</Link>
 
-        <button 
-        onClick={()=>handleDelete(blog.id)} 
-        className='btn btn-sm btn-danger ms-2'
-        >Delete
-        </button>
-    </div>
-
-    </td>
-  </tr>
-))}
-
-        </tbody>
-      </table>
+      {content}
     </div>
   );
 }
