@@ -16,6 +16,9 @@ function ProductUpdate() {
   const product = productsState.products.find((b) => b._id === id);
   console.log(product);
 
+  const availableColors = ['red', 'green', 'blue', 'white', 'black', 'brown'];
+  const availableSizes = ['S', 'M', 'X', 'XL', 'XXL', 'XXL'];
+
   const { name, price, stock, categoryId, subCategoryId, brandId, discount, size, colors } =
     product;
 

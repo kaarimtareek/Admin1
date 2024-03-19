@@ -57,6 +57,7 @@ function ProductHome() {
             <th>Stock</th>
             <th>Category</th>
             <th>SubCategory</th>
+            <th>Brand</th>
             <th>Discount</th>
             <th>Sizes</th>
             <th>Colors</th>
@@ -83,8 +84,9 @@ function ProductHome() {
                 </td>
                 <td>{product.price}</td>
                 <td>{product.stock}</td>
-                <td>{product.categoryId}</td>
-                <td>{product.subCategoryId}</td>
+                <td>{product.categoryId.name}</td>
+                <td>{product.subCategoryId.name}</td>
+                <td>{product.brandId.name}</td>
                 <td>{product.discount}</td>
                 <td>{product.size.join(', ')}</td>
                 <td>{product.colors.join(', ')}</td>
