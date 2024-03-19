@@ -126,7 +126,9 @@ const couponSlice = createSlice({
     builder.addCase(addCoupon.fulfilled, (state, action) => {
       state.status = 'idle';
     });
-    builder.addCase(updateCoupon.fulfilled, (state, action) => {});
+    builder.addCase(updateCoupon.fulfilled, (state, action) => {
+      state.status = 'idle';
+    });
 
     builder.addCase(getCoupons.pending, (state) => {
       state.loading = true;

@@ -16,7 +16,7 @@ export const getBlogs = createAsyncThunk('blogs/getBlogs', () => {
     .then((res) => res.data.categories);
 });
 
-export const updateBlog = createAsyncThunk('brands/updateBlog', ({ id, name, img }) => {
+export const updateBlog = createAsyncThunk('brands/updateBlog', async ({ id, name, img }) => {
   // eslint-disable-next-line no-debugger
   debugger;
 
@@ -43,13 +43,39 @@ export const updateBlog = createAsyncThunk('brands/updateBlog', ({ id, name, img
   console.log(config);
 
   // Send the request using Axios
-  axios(config)
-    .then((response) => {
-      console.log('Response:', response);
-    })
-    .catch((error) => {
-      console.log('Error:', error);
-    });
+  const response = await axios(config);
+  console.log(response);
+});
+
+export const addBlog = createAsyncThunk('brands/addBlog', async ({ name, img }) => {
+  // eslint-disable-next-line no-debugger
+  debugger;
+
+  const token = import.meta.env.VITE_BASE_JWT_TOKEN;
+
+  const formData = new FormData();
+  formData.append('name', name);
+  if (img !== null) {
+    formData.append('file', img);
+  }
+
+  const headers = {
+    'Content-Type': 'multipart/form-data',
+    Authorization: token,
+  };
+
+  const config = {
+    method: 'post',
+    url: `${baseUrl}/category`,
+    headers,
+    data: formData,
+  };
+
+  console.log(config);
+
+  // Send the request using Axios
+  const response = await axios(config);
+  console.log(response);
 });
 
 const initialState = {
@@ -65,6 +91,9 @@ const blogSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(updateBlog.fulfilled, (state) => {
+      state.status = 'idle';
+    });
+    builder.addCase(addBlog.fulfilled, (state) => {
       state.status = 'idle';
     });
     builder.addCase(getBlogs.pending, (state) => {
@@ -88,6 +117,6 @@ const blogSlice = createSlice({
   },
 });
 
-export const { addBlog, deleteBlog } = blogSlice.actions;
+export const { deleteBlog } = blogSlice.actions;
 export const selectAllBlogs = (state) => state.blogs;
 export default blogSlice.reducer;

@@ -22,7 +22,6 @@ function BlogUpdate() {
   const [successMessage, setSuccessMessage] = useState('');
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const handleUpdate = (event) => {
     event.preventDefault();
@@ -33,8 +32,7 @@ function BlogUpdate() {
         img: uimg,
       })
     ).then(() => {
-      console.log();
-      setSuccessMessage('Brand updated successfully!');
+      setSuccessMessage('category has been updated successfully!');
       setTimeout(() => {
         setSuccessMessage('');
       }, 3000);

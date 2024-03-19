@@ -3,7 +3,8 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 const baseUrl = import.meta.env.VITE_BASE_API_URL;
 
-export const getBlogs = createAsyncThunk('blogs/getBlogs', () => {
+// eslint-disable-next-line arrow-body-style
+export const getProducts = createAsyncThunk('products/getProducts', async () => {
   const token = import.meta.env.VITE_BASE_JWT_TOKEN;
 
   return axios
@@ -12,7 +13,69 @@ export const getBlogs = createAsyncThunk('blogs/getBlogs', () => {
         Authorization: token,
       },
     })
-    .then((res) => res.data.categories);
+    .then((res) => res.data.products);
+});
+
+export const updateProduct = createAsyncThunk('brands/updateProduct', async ({ id, name, img }) => {
+  // eslint-disable-next-line no-debugger
+  debugger;
+
+  const token = import.meta.env.VITE_BASE_JWT_TOKEN;
+
+  const formData = new FormData();
+  formData.append('name', name);
+  if (img !== null) {
+    formData.append('file', img);
+  }
+
+  const headers = {
+    'Content-Type': 'multipart/form-data',
+    Authorization: token,
+  };
+
+  const config = {
+    method: 'put',
+    url: `${baseUrl}/category/${id}`,
+    headers,
+    data: formData,
+  };
+
+  console.log(config);
+
+  // Send the request using Axios
+  const response = await axios(config);
+  console.log(response);
+});
+
+export const addProduct = createAsyncThunk('brands/addProduct', async ({ name, img }) => {
+  // eslint-disable-next-line no-debugger
+  debugger;
+
+  const token = import.meta.env.VITE_BASE_JWT_TOKEN;
+
+  const formData = new FormData();
+  formData.append('name', name);
+  if (img !== null) {
+    formData.append('file', img);
+  }
+
+  const headers = {
+    'Content-Type': 'multipart/form-data',
+    Authorization: token,
+  };
+
+  const config = {
+    method: 'post',
+    url: `${baseUrl}/category`,
+    headers,
+    data: formData,
+  };
+
+  console.log(config);
+
+  // Send the request using Axios
+  const response = await axios(config);
+  console.log(response);
 });
 
 const initialState = {
@@ -26,39 +89,34 @@ const productSlice = createSlice({
   name: 'products',
   initialState,
   reducers: {},
+  extraReducers: (builder) => {
+    builder.addCase(updateProduct.fulfilled, (state) => {
+      state.status = 'idle';
+    });
+    builder.addCase(addProduct.fulfilled, (state) => {
+      state.status = 'idle';
+    });
+    builder.addCase(getProducts.pending, (state) => {
+      state.loading = true;
+      state.status = 'working';
+      console.log('loading now is true');
+    });
+    builder.addCase(getProducts.fulfilled, (state, action) => {
+      state.loading = false;
+      console.log('loading now is true fulfilled');
+      state.status = 'fulfilled';
+      state.products = action.payload;
+    });
+    builder.addCase(getProducts.rejected, (state, action) => {
+      state.loading = false;
+      state.products = [];
+      state.status = 'rejected';
+      console.log('loading now is false rejected');
+      state.error = action.error.message;
+    });
+  },
 });
-export const { addProduct, updateProduct, deleteProduct } = productSlice.actions;
+
+export const { deleteProduct } = productSlice.actions;
+export const selectAllProducts = (state) => state.products;
 export default productSlice.reducer;
-
-// import { createSlice } from "@reduxjs/toolkit";
-
-// import { blogList } from "./Data";
-
-// const blogSlice = createSlice({
-//     name: "blogs",
-//     initialState: blogList,
-//     reducers: {
-//         addBlog: (state, action) => {
-//             state.push(action.payload);
-//         },
-//         updateBlog: (state, action) => {
-//             const { id, name, img } = action.payload;
-//             const blogToUpdate = state.find(blog => blog.id === id);
-//             if (blogToUpdate) {
-//                 blogToUpdate.name = name;
-//                 blogToUpdate.img = img;
-//             }
-//         },
-//         deleteBlog: (state, action) => {
-//             const { id } = action.payload;
-//             // Modify the state directly
-//             const index = state.findIndex(blog => blog.id === id);
-//             if (index !== -1) {
-//                 state.splice(index, 1);
-//             }
-//         }
-//     }
-// });
-
-// export const { addBlog, updateBlog, deleteBlog } = blogSlice.actions;
-// export default blogSlice.reducer;
