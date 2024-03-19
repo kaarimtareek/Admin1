@@ -10,11 +10,14 @@ export const getBrands = createAsyncThunk('brands/getBrands', () =>
 );
 
 export const updateBrand = createAsyncThunk('brands/updateBrand', ({ id, name, img }) => {
+  // eslint-disable-next-line no-debugger
+  debugger;
+
   const token = import.meta.env.VITE_BASE_JWT_TOKEN;
 
   const formData = new FormData();
   formData.append('name', name);
-  // formData.append('image', img);
+  formData.append('file', img);
 
   const headers = {
     'Content-Type': 'multipart/form-data', // Set the Content-Type header
@@ -39,6 +42,35 @@ export const updateBrand = createAsyncThunk('brands/updateBrand', ({ id, name, i
     });
 });
 
+export const addBrand = createAsyncThunk('brands/addBrand', async ({ name, img }) => {
+  // eslint-disable-next-line no-debugger
+  debugger;
+
+  const token = import.meta.env.VITE_BASE_JWT_TOKEN;
+
+  const formData = new FormData();
+  formData.append('name', name);
+  formData.append('file', img);
+
+  const headers = {
+    'Content-Type': 'multipart/form-data',
+    Authorization: token,
+  };
+
+  const config = {
+    method: 'post',
+    url: `${baseUrl}/brand`,
+    headers,
+    data: formData,
+  };
+
+  console.log(config);
+
+  // Send the request using Axios
+  const response = await axios(config);
+  console.log(response);
+});
+
 const initialState = {
   brands: [],
   loading: false,
@@ -51,11 +83,12 @@ const brandSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    // eslint-disable-next-line no-debugger
     builder.addCase(updateBrand.fulfilled, (state, action) => {
       state.status = 'idle';
     });
-
+    builder.addCase(addBrand.fulfilled, (state, action) => {
+      state.status = 'idle';
+    });
     builder.addCase(getBrands.pending, (state) => {
       state.loading = true;
       state.status = 'working';
@@ -76,40 +109,7 @@ const brandSlice = createSlice({
     });
   },
 });
-export const { addBrand, deleteBrand } = brandSlice.actions;
+export const { deleteBrand } = brandSlice.actions;
 export const selectAllBrands = (state) => state.brands;
 
 export default brandSlice.reducer;
-
-// import { createSlice } from "@reduxjs/toolkit";
-
-// import { blogList } from "./Data";
-
-// const blogSlice = createSlice({
-//     name: "blogs",
-//     initialState: blogList,
-//     reducers: {
-//         addBlog: (state, action) => {
-//             state.push(action.payload);
-//         },
-//         updateBlog: (state, action) => {
-//             const { id, name, img } = action.payload;
-//             const blogToUpdate = state.find(blog => blog.id === id);
-//             if (blogToUpdate) {
-//                 blogToUpdate.name = name;
-//                 blogToUpdate.img = img;
-//             }
-//         },
-//         deleteBlog: (state, action) => {
-//             const { id } = action.payload;
-//             // Modify the state directly
-//             const index = state.findIndex(blog => blog.id === id);
-//             if (index !== -1) {
-//                 state.splice(index, 1);
-//             }
-//         }
-//     }
-// });
-
-// export const { addBlog, updateBlog, deleteBlog } = blogSlice.actions;
-// export default blogSlice.reducer;

@@ -7,85 +7,85 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addBlog } from './BlogReducer'; // Importing addBlog action creator from the reducer file
 
 function BlogCreate() {
-    const [name, setName] = useState('');
-    // eslint-disable-next-line no-unused-vars
-    const [img, setImg] = useState(null); // State to store the selected image file
-    const [imgPreview, setImgPreview] = useState(null); // State to store the base64 image preview
+  const [name, setName] = useState('');
+  // eslint-disable-next-line no-unused-vars
+  const [img, setImg] = useState(null); // State to store the selected image file
+  const [imgPreview, setImgPreview] = useState(null); // State to store the base64 image preview
+  const [successMessage, setSuccessMessage] = useState('');
 
-    const blogs = useSelector((state) => state.blogs);
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
+  const handleSubmit = (event) => {
+    event.preventDefault();
 
-        // Check if name and imgPreview are provided
-        if (!name || !imgPreview) {
-            alert('Please provide a name and select an image.');
-            return;
-        }
-
-        const newBlog = {
-            id: blogs && blogs.length > 0 ? blogs[blogs.length - 1].id + 1 : 1,
-            name,
-            img: imgPreview
-        };
-
-        dispatch(addBlog(newBlog));
-
-        // Reset the form fields
-        setName('');
-        setImg(null);
-        setImgPreview(null);
-
-        navigate('/BlogHome');
+    // Check if name and imgPreview are provided
+    if (!name || !imgPreview) {
+      alert('Please provide a name and select an image.');
+      return;
     }
 
-    const handleFileChange = (event) => {
-        // Set the selected image file to the state
-        const file = event.target.files[0];
-        setImg(file);
+    const newBlog = {
+      name,
+      img,
+    };
 
-        // Convert the file to base64 string for preview
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setImgPreview(reader.result);
-        };
-        reader.readAsDataURL(file);
-    }
+    dispatch(addBlog(newBlog)).then(() => {
+      setSuccessMessage('a new category has been created successfully!');
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 3000);
+    });
+  };
 
-    return (
-        <div className='d-flex w-100 vh-100 justify-content-center align-items-center'>
-            <div className='w-50 border bg-secondary text-white p-5'>
-                <h3>Add New Category</h3>
-                <form onSubmit={handleSubmit}>
-                    <div>  
-                        <label htmlFor="name">Name:</label>
-                        <input 
-                            type="text" 
-                            id="name" 
-                            name="name" 
-                            className="form-control" 
-                            value={name} 
-                            onChange={e => setName(e.target.value)} 
-                        />       
-                    </div>
-                    <div>
-                        <label htmlFor="img">Image:</label>
-                        <input 
-                            type="file"
-                            id="img" 
-                            name='img' 
-                            className='form-control'
-                            onChange={handleFileChange} 
-                        />
-                    </div>                                                
-                    <br />
-                    <button type='submit' className='btn btn-info'>Submit</button>
-                </form>
-            </div>
-        </div>
-    );
+  const handleFileChange = (event) => {
+    // Set the selected image file to the state
+    const file = event.target.files[0];
+    setImg(file);
+
+    // Convert the file to base64 string for preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImgPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  return (
+    <div className="d-flex w-100 vh-100 justify-content-center align-items-center">
+      <div className="w-50 border bg-secondary text-white p-5">
+        <h3>Add New Category</h3>
+        {successMessage && <p style={{ color: '#66ff99' }}>{successMessage}</p>}
+
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label htmlFor="name">Name:</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              className="form-control"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="img">Image:</label>
+            <input
+              type="file"
+              id="img"
+              name="img"
+              className="form-control"
+              onChange={handleFileChange}
+            />
+          </div>
+          <br />
+          <button type="submit" className="btn btn-info">
+            Submit
+          </button>
+        </form>
+      </div>
+    </div>
+  );
 }
 
 export default BlogCreate;

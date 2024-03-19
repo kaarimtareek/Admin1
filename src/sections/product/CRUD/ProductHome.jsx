@@ -1,6 +1,8 @@
 /* eslint-disable react/button-has-type */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { Spinner } from 'react-bootstrap';
+
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -8,21 +10,19 @@ import { Button } from '@mui/material';
 
 import Iconify from 'src/components/iconify/iconify';
 
-import { productList } from './Data';
-import { deleteProduct } from './ProductReducer';
+import { deleteProduct, getProducts } from './ProductReducer';
 
 function ProductHome() {
-  const products = useSelector((state) => state.products);
+  const productsState = useSelector((state) => state.products);
+  console.log(productsState);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  // eslint-disable-next-line no-unused-vars
   const [primImg, setPrimImage] = useState(null);
 
-  const handleDelete = (id) => {
-    console.log('Deleting Product with ID:', id);
-    dispatch(deleteProduct({ id }));
-    navigate('/ProductHome');
-  };
+  useEffect(() => {
+    if (productsState.status === 'idle') {
+      dispatch(getProducts());
+    }
+  }, [productsState.status, dispatch]);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -37,6 +37,72 @@ function ProductHome() {
     }
   };
 
+  let content;
+  if (productsState.loading) {
+    // eslint-disable-next-line react/jsx-no-undef
+    content = <Spinner text="loading" />;
+  } else if (productsState.status === 'rejected') {
+    content = <h2> error in fetching data {productsState.error}</h2>;
+  } else {
+    const { products } = productsState;
+    console.log(products);
+    content = (
+      <table className="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Image</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Category</th>
+            <th>SubCategory</th>
+            <th>Discount</th>
+            <th>Sizes</th>
+            <th>Colors</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {products &&
+            products.map((product) => (
+              <tr key={product._id}>
+                <td>{product._id}</td>
+                <td>{product.name}</td>
+                <td>
+                  {/* Display uploaded image or placeholder */}
+                  {product.mainImage ? (
+                    <img
+                      src={product.mainImage.secure_url}
+                      alt="Uploaded"
+                      style={{ maxWidth: '100px' }}
+                    />
+                  ) : (
+                    <input type="file" accept="image/*" onChange={handleImageUpload} />
+                  )}
+                </td>
+                <td>{product.price}</td>
+                <td>{product.stock}</td>
+                <td>{product.categoryId}</td>
+                <td>{product.subCategoryId}</td>
+                <td>{product.discount}</td>
+                <td>{product.size.join(', ')}</td>
+                <td>{product.colors.join(', ')}</td>
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    {/* <Link to={`/BlogUpdate/${blogList.id}`} className='btn btn-sm btn-primary'>Edit</Link> */}
+                    <Link to={`/ProductUpdate/${product._id}`} className="btn btn-sm btn-primary">
+                      Edit
+                    </Link>
+                  </div>
+                </td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+    );
+  }
+
   return (
     <div className="container">
       <h2>Products Page</h2>
@@ -49,66 +115,7 @@ function ProductHome() {
       >
         Create
       </Button>
-      <table className="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Image</th>
-            <th>Price</th>
-            <th>Stock</th>
-            <th>Category</th>
-            <th>SubCategory</th>
-            {/* <th style={{ fontSize: 'smaller' }}>Discount</th> */}
-            <th>Size</th>
-            <th>Color</th>
-            {/* <th style={{ fontSize: 'smaller' }}>Final Price</th> */}
-            {/* <th style={{ fontSize: 'smaller' }}>Description</th> */}
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {productList &&
-            productList.map((product) => (
-              <tr key={product.id}>
-                <td>{product.id}</td>
-                <td>{product.name}</td>
-                <td>
-                  {/* Display uploaded image or placeholder */}
-                  {product.primImg ? (
-                    <img src={product.primImg} alt="Uploaded" style={{ maxWidth: '100px' }} />
-                  ) : (
-                    <input type="file" accept="image/*" onChange={handleImageUpload} />
-                  )}
-                </td>
-                <td>{product.price}</td>
-                <td>{product.stock}</td>
-                <td>{product.categoryId}</td>
-                <td>{product.subCategoryId}</td>
-                {/* <td>{product.discount}</td> */}
-                <td>{product.size}</td>
-                <td>{product.color}</td>
-                {/* <td>{product.finalPrice}</td> */}
-                {/* <td>{product.description}</td> */}
-                <td>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    {/* <Link to={`/BlogUpdate/${blogList.id}`} className='btn btn-sm btn-primary'>Edit</Link> */}
-                    <Link to={`/ProductUpdate/${product.id}`} className="btn btn-sm btn-primary">
-                      Edit
-                    </Link>
-
-                    <button
-                      onClick={() => handleDelete(product.id)}
-                      className="btn btn-sm btn-danger ms-2"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
+      {content}
     </div>
   );
 }

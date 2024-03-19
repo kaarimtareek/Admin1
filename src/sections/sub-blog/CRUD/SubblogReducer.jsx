@@ -45,6 +45,35 @@ export const updateSubblog = createAsyncThunk('brands/updateSubblog', ({ id, nam
     });
 });
 
+export const addSubBlog = createAsyncThunk('brands/addSubblog', async ({ name, img }) => {
+  // eslint-disable-next-line no-debugger
+  debugger;
+
+  const token = import.meta.env.VITE_BASE_JWT_TOKEN;
+
+  const formData = new FormData();
+  formData.append('name', name);
+  formData.append('file', img);
+
+  const headers = {
+    'Content-Type': 'multipart/form-data',
+    Authorization: token,
+  };
+
+  const config = {
+    method: 'post',
+    url: `${baseUrl}/category/65d491ae7d597cdac7f67bf6/subcategory`,
+    headers,
+    data: formData,
+  };
+
+  console.log(config);
+
+  // Send the request using Axios
+  const response = await axios(config);
+  console.log(response);
+});
+
 const initialState = {
   subBlogs: [],
   loading: false,
@@ -56,44 +85,12 @@ const initialState = {
 const subblogSlice = createSlice({
   name: 'subblogs',
   initialState,
-  reducers: {
-    addSubBlog: (state, action) => {
-      // eslint-disable-next-line no-debugger
-      debugger;
-
-      const { name, image } = action.payload;
-      const token = import.meta.env.VITE_BASE_JWT_TOKEN;
-
-      const formData = new FormData();
-      formData.append('name', name);
-      formData.append('image', image);
-
-      const headers = {
-        'Content-Type': 'multipart/form-data',
-        Authorization: token,
-      };
-
-      const config = {
-        method: 'post',
-        url: `${baseUrl}/category/65d491ae7d597cdac7f67bf6/subcategory`,
-        headers,
-        data: formData,
-      };
-
-      console.log(config);
-
-      // Send the request using Axios
-      axios(config)
-        .then((response) => {
-          console.log('Response:', response);
-        })
-        .catch((error) => {
-          console.error('Error:', error);
-        });
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder.addCase(updateSubblog.fulfilled, (state, action) => {
+      state.status = 'idle';
+    });
+    builder.addCase(addSubBlog.fulfilled, (state, action) => {
       state.status = 'idle';
     });
     builder.addCase(getsubBlogs.pending, (state) => {
@@ -118,7 +115,7 @@ const subblogSlice = createSlice({
   },
 });
 
-export const { addSubBlog, deleteSubblog } = subblogSlice.actions;
+export const { deleteSubblog } = subblogSlice.actions;
 export const selectAllSubBlogs = (state) => state.subBlogs;
 
 export default subblogSlice.reducer;

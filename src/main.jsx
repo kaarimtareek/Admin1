@@ -11,6 +11,8 @@ import BlogReducer from './sections/blog/CRUD/BlogReducer';
 import BrandReducer from './sections/brand/CRUD/BrandReducer';
 import CoponReducer from './sections/copon/CRUD/CoponReducer';
 import SubblogReducer from './sections/sub-blog/CRUD/SubblogReducer';
+import { products } from './_mock/products';
+import ProductReducer from './sections/product/CRUD/ProductReducer';
 
 const store = configureStore({
   reducer: {
@@ -19,6 +21,7 @@ const store = configureStore({
     blogs: BlogReducer,
     subBlogs: SubblogReducer,
     coupons: CoponReducer,
+    products: ProductReducer,
   },
 });
 
