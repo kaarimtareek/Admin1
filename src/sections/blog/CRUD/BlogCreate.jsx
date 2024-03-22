@@ -29,11 +29,20 @@ function BlogCreate() {
       img,
     };
 
-    dispatch(addBlog(newBlog)).then(() => {
-      setSuccessMessage('a new category has been created successfully!');
-      setTimeout(() => {
-        setSuccessMessage('');
-      }, 3000);
+    dispatch(addBlog(newBlog)).then((res) => {
+      if (res.meta.requestStatus === 'fulfilled') {
+        setSuccessMessage('category has been updated successfully!');
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 3000);
+      } else {
+        const errors = res.payload.response.data.details;
+        let errorMessage = '';
+        errors.forEach((error) => {
+          errorMessage += `${error.message}\n`;
+        });
+        alert(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
+      }
     });
   };
 

@@ -21,6 +21,10 @@ function BlogUpdate() {
   const [uimg, setImg] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
 
+  if (name === uname) {
+    alert('name must be unique');
+  }
+
   const dispatch = useDispatch();
 
   const handleUpdate = (event) => {
@@ -31,11 +35,20 @@ function BlogUpdate() {
         name: uname,
         img: uimg,
       })
-    ).then(() => {
-      setSuccessMessage('category has been updated successfully!');
-      setTimeout(() => {
-        setSuccessMessage('');
-      }, 3000);
+    ).then((res) => {
+      if (res.meta.requestStatus === 'fulfilled') {
+        setSuccessMessage('category has been updated successfully!');
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 3000);
+      } else {
+        const errors = res.payload.response.data.details;
+        let errorMessage = '';
+        errors.forEach((error) => {
+          errorMessage += `${error.message}\n`;
+        });
+        alert(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
+      }
     });
   };
   return (

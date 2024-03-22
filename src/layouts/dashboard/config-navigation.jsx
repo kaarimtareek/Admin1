@@ -38,11 +38,15 @@ const navConfig = [
     icon: icon('ic_blog'),
   },
   {
-    title: 'coupon',
+    title: 'Coupon',
     path: '/copon',
     icon: icon('copon'),
   },
-
+  {
+    title: 'Order',
+    path: '/order',
+    icon: icon('my-orders-icon'),
+  },
 ];
 
 export default navConfig;

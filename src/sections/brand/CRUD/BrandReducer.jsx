@@ -4,72 +4,83 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 // const createAsyncThunk = from require("@reduxjs/toolkit").createAsyncThunk ;
 
 const baseUrl = import.meta.env.VITE_BASE_API_URL;
+const token = localStorage.getItem('userToken');
 
 export const getBrands = createAsyncThunk('brands/getBrands', () =>
   axios.get(`${baseUrl}/brand`).then((res) => res.data.brand)
 );
 
-export const updateBrand = createAsyncThunk('brands/updateBrand', ({ id, name, img }) => {
-  // eslint-disable-next-line no-debugger
-  debugger;
+export const updateBrand = createAsyncThunk(
+  'brands/updateBrand',
+  async ({ id, name, img }, { rejectWithValue }) => {
+    const formData = new FormData();
+    formData.append('name', name);
+    if (img !== null) {
+      formData.append('file', img);
+    }
 
-  const token = import.meta.env.VITE_BASE_JWT_TOKEN;
+    const headers = {
+      'Content-Type': 'multipart/form-data', // Set the Content-Type header
+      Authorization: token, // Set the Authorization header
+    };
 
-  const formData = new FormData();
-  formData.append('name', name);
-  formData.append('file', img);
+    const config = {
+      method: 'put',
+      url: `${baseUrl}/brand/${id}`,
+      headers,
+      data: formData,
+    };
 
-  const headers = {
-    'Content-Type': 'multipart/form-data', // Set the Content-Type header
-    Authorization: token, // Set the Authorization header
-  };
+    console.log(config);
 
-  const config = {
-    method: 'put',
-    url: `${baseUrl}/brand/${id}`,
-    headers,
-    data: formData,
-  };
+    try {
+      const response = await axios(config);
+      if (response.status === 200 || response.status === 201 || response.status === 202) {
+        return response.data;
+      }
+      throw new Error(response.data);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
 
-  console.log(config);
+export const addBrand = createAsyncThunk(
+  'brands/addBrand',
+  async ({ name, img }, { rejectWithValue }) => {
+    const formData = new FormData();
+    formData.append('name', name);
 
-  axios(config)
-    .then((response) => {
-      console.log('Response:', response);
-    })
-    .catch((error) => {
-      console.error('Error:', error);
-    });
-});
+    if (img !== null) {
+      formData.append('file', img);
+    }
 
-export const addBrand = createAsyncThunk('brands/addBrand', async ({ name, img }) => {
-  // eslint-disable-next-line no-debugger
-  debugger;
+    const headers = {
+      'Content-Type': 'multipart/form-data',
+      Authorization: token,
+    };
 
-  const token = import.meta.env.VITE_BASE_JWT_TOKEN;
+    const config = {
+      method: 'post',
+      url: `${baseUrl}/brand`,
+      headers,
+      data: formData,
+    };
 
-  const formData = new FormData();
-  formData.append('name', name);
-  formData.append('file', img);
+    console.log(config);
 
-  const headers = {
-    'Content-Type': 'multipart/form-data',
-    Authorization: token,
-  };
-
-  const config = {
-    method: 'post',
-    url: `${baseUrl}/brand`,
-    headers,
-    data: formData,
-  };
-
-  console.log(config);
-
-  // Send the request using Axios
-  const response = await axios(config);
-  console.log(response);
-});
+    // Send the request using Axios
+    try {
+      const response = await axios(config);
+      if (response.status === 200 || response.status === 201 || response.status === 202) {
+        return response.data;
+      }
+      throw new Error(response.data);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
 
 const initialState = {
   brands: [],

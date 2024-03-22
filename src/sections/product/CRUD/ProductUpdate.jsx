@@ -1,11 +1,27 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { Container } from 'react-bootstrap';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { MultiSelect } from 'react-multi-select-component';
 
-import { productList } from './Data';
 import { updateProduct } from './ProductReducer';
+
+const baseUrl = import.meta.env.VITE_BASE_API_URL;
+const token = localStorage.getItem('userToken');
+
+const getCategoryOptions = async () => {
+  const response = await axios(`${baseUrl}/category`, {
+    headers: {
+      Authorization: token,
+    },
+  });
+  const { categories } = await response.data;
+  return categories.map((c) => ({ label: c.name, value: c._id }));
+};
 
 function ProductUpdate() {
   const { id } = useParams();
@@ -16,56 +32,90 @@ function ProductUpdate() {
   const product = productsState.products.find((b) => b._id === id);
   console.log(product);
 
-  const availableColors = ['red', 'green', 'blue', 'white', 'black', 'brown'];
-  const availableSizes = ['S', 'M', 'X', 'XL', 'XXL', 'XXL'];
+  let categoryOptions = [];
+  getCategoryOptions().then((res) => {
+    categoryOptions = res;
+  });
 
-  const { name, price, stock, categoryId, subCategoryId, brandId, discount, size, colors } =
-    product;
+  console.log(categoryOptions);
+
+  const colorOptions = [
+    { label: 'Red', value: 'red' },
+    { label: 'Blue', value: 'blue' },
+    { label: 'Green', value: 'green' },
+    { label: 'Black', value: 'black' },
+    { label: 'White', value: 'white' },
+    { label: 'Brown', value: 'brown' },
+  ];
+
+  const sizeOptions = [
+    { label: 'Small', value: 'small' },
+    { label: 'Medium', value: 'medium' },
+    { label: 'Large', value: 'large' },
+    { label: 'X-Large', value: 'x-large' },
+    { label: 'XX-Large', value: 'xx-large' },
+    { label: 'XXX-Large', value: 'xxx-large' },
+  ];
+
+  const { name, price, stock, categoryId, subCategoryId, brandId, discount } = product;
 
   const [uname, setName] = useState(name);
   const [uprimImg, setPrimImg] = useState(null);
-  const [usubImg1, setSubImg1] = useState(null);
-  const [usubImg2, setSubImg2] = useState(null);
-  const [usubImg3, setSubImg3] = useState(null);
-  const [usubImg4, setSubImg4] = useState(null);
-  const [usubImg5, setSubImg5] = useState(null);
-  const [usubImg6, setSubImg6] = useState(null);
-
+  const [uSubImages, setSubImages] = useState([]);
+  const [selectedColors, setSelectedColors] = useState([]);
+  const [selectedSizes, setSelectedSizes] = useState([]);
   const [uprice, setPrice] = useState(price);
   const [ustock, setStock] = useState(stock);
-  const [ucategoryId, setCategoryId] = useState(categoryId);
-  const [ubrandId, setBrandId] = useState(brandId);
-  const [usubCategoryId, setSubCategoryId] = useState(subCategoryId);
+  // const [ucategoryId, setCategoryId] = useState(categoryId.id);
+  // const [ubrandId, setBrandId] = useState(brandId._id);
+  // const [usubCategoryId, setSubCategoryId] = useState(subCategoryId._id);
   const [udiscount, setDiscount] = useState(discount);
-  const [usize, setSize] = useState(size.join(', '));
-  const [ucolor, setColor] = useState(colors.join(', '));
+  const [successMessage, setSuccessMessage] = useState('');
+
+  console.log(selectedSizes);
+  console.log(selectedColors);
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+
+  const productToUpdate = {
+    id,
+    name: uname,
+    mainImage: uprimImg,
+    subImages: uSubImages,
+    price: uprice,
+    stock: ustock,
+    // brandId: ubrandId,
+    // categoryId: ucategoryId,
+    // subCategoryId: usubCategoryId,
+    discount: udiscount,
+    sizes: selectedSizes.map((item) => item.value),
+    colors: selectedColors.map((item) => item.value),
+  };
 
   const handleUpdate = (event) => {
     event.preventDefault();
-    dispatch(
-      updateProduct({
-        id,
-        name: uname,
-        primImg: uprimImg,
-        subImg1: usubImg1,
-        subImg2: usubImg2,
-        subImg3: usubImg3,
-        subImg4: usubImg4,
-        subImg5: usubImg5,
-        subImg6: usubImg6,
+    dispatch(updateProduct(productToUpdate)).then((res) => {
+      if (res.meta.requestStatus === 'fulfilled') {
+        setSuccessMessage('product has been updated successfully!');
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 3000);
+      } else {
+        const errors = res.payload.response.data.details;
+        let errorMessage = '';
+        errors.forEach((error) => {
+          errorMessage += `${error.message}\n`;
+        });
+        alert(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
+      }
+    });
+  };
 
-        price: uprice,
-        stock: ustock,
-        categoryId: ucategoryId,
-        subCategoryId: usubCategoryId,
-        discount: udiscount,
-        size: usize,
-        color: ucolor,
-      })
-    );
+  const handleSubImageChange = (e) => {
+    const { files } = e.target;
+    setSubImages(Array.from(files));
+    // You can handle these subImages however you need, perhaps uploading to a server or storing locally.
+    console.log(uSubImages);
   };
 
   return (
@@ -73,6 +123,8 @@ function ProductUpdate() {
       <div className="d-flex w-100 vh-100 justify-content-center align-items-center">
         <div className="w-50 border bg-secondary text-white p-5">
           <h3>Edit Product</h3>
+          {successMessage && <p style={{ color: '#66ff99' }}>{successMessage}</p>}
+
           <form onSubmit={handleUpdate}>
             <div>
               {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
@@ -95,86 +147,19 @@ function ProductUpdate() {
                 id="primImg"
                 name="primImg"
                 className="form-control"
-                value={uprimImg}
-                onChange={(e) => setPrimImg(e.target.value)}
+                onChange={(e) => setPrimImg(e.target.files[0])}
               />
             </div>
 
             <div>
-              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-              <label htmlFor="subImg1">Sub-Image 1:</label>
+              <label htmlFor="subImages">Sub-Images:</label>
               <input
                 type="file"
-                id="subImg1"
-                name="subImg1"
+                id="subImages"
+                name="subImages"
                 className="form-control"
-                value={usubImg1}
-                onChange={(e) => setSubImg1(e.target.value)}
-              />
-            </div>
-
-            <div>
-              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-              <label htmlFor="subImg2">Sub-Image 2:</label>
-              <input
-                type="file"
-                id="subImg2"
-                name="subImg2"
-                className="form-control"
-                value={usubImg2}
-                onChange={(e) => setSubImg2(e.target.value)}
-              />
-            </div>
-
-            <div>
-              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-              <label htmlFor="subImg3">Sub-Image 3:</label>
-              <input
-                type="file"
-                id="subImg3"
-                name="subImg3"
-                className="form-control"
-                value={usubImg3}
-                onChange={(e) => setSubImg3(e.target.value)}
-              />
-            </div>
-
-            <div>
-              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-              <label htmlFor="subImg4">Sub-Image 4:</label>
-              <input
-                type="file"
-                id="subImg4"
-                name="subImg4"
-                className="form-control"
-                value={usubImg4}
-                onChange={(e) => setSubImg4(e.target.value)}
-              />
-            </div>
-
-            <div>
-              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-              <label htmlFor="subImg5">Sub-Image 5:</label>
-              <input
-                type="file"
-                id="subImg5"
-                name="subImg5"
-                className="form-control"
-                value={usubImg5}
-                onChange={(e) => setSubImg5(e.target.value)}
-              />
-            </div>
-
-            <div>
-              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-              <label htmlFor="subImg6">Sub-Image 6:</label>
-              <input
-                type="file"
-                id="subImg6"
-                name="subImg6"
-                className="form-control"
-                value={usubImg6}
-                onChange={(e) => setSubImg6(e.target.value)}
+                multiple // Allows multiple file selection
+                onChange={handleSubImageChange} // Handles file selection
               />
             </div>
 
@@ -204,8 +189,7 @@ function ProductUpdate() {
               />
             </div>
 
-            <div>
-              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+            {/* <div>
               <label htmlFor="categoryId">Category ID:</label>
               <input
                 type="text"
@@ -215,10 +199,9 @@ function ProductUpdate() {
                 value={ucategoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
               />
-            </div>
+            </div> */}
 
-            <div>
-              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+            {/* <div>
               <label htmlFor="subCategoryId">Sub-Category ID:</label>
               <input
                 type="text"
@@ -228,10 +211,9 @@ function ProductUpdate() {
                 value={usubCategoryId}
                 onChange={(e) => setSubCategoryId(e.target.value)}
               />
-            </div>
+            </div> */}
 
-            <div>
-              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+            {/* <div>
               <label htmlFor="brandId">Brand ID:</label>
               <input
                 type="text"
@@ -241,7 +223,7 @@ function ProductUpdate() {
                 value={ubrandId}
                 onChange={(e) => setBrandId(e.target.value)}
               />
-            </div>
+            </div> */}
 
             <div>
               {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
@@ -258,31 +240,28 @@ function ProductUpdate() {
 
             <div>
               {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-              <label htmlFor="size">Size:</label>
-              <input
-                type="text"
-                id="size"
-                name="size"
-                className="form-control"
-                value={usize}
-                onChange={(e) => setSize(e.target.value)}
+              <label htmlFor="size">Sizes:</label>
+              <MultiSelect
+                options={sizeOptions}
+                value={selectedSizes}
+                onChange={setSelectedSizes}
+                labelledBy="Select"
               />
             </div>
 
             <div>
               {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-              <label htmlFor="color">Color:</label>
-              <input
-                type="text"
-                id="color"
-                name="color"
-                className="form-control"
-                value={ucolor}
-                onChange={(e) => setColor(e.target.value)}
+              <label htmlFor="color">Colors:</label>
+              <MultiSelect
+                options={colorOptions}
+                value={selectedColors}
+                onChange={setSelectedColors}
+                labelledBy="Select"
               />
             </div>
 
             <br />
+
             <button type="submit" className="btn btn-info">
               Update
             </button>

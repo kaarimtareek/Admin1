@@ -38,6 +38,9 @@ export default function AccountPopover() {
   };
 
   const handleClose = () => {
+    localStorage.removeItem('userToken');
+    localStorage.removeItem('isLoggedIn');
+    window.location.reload();
     setOpen(null);
   };
 

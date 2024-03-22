@@ -4,7 +4,7 @@ import { BrandView } from 'src/sections/brand/view';
 
 // ----------------------------------------------------------------------
 
-export default function UserPage() {
+export default function BrandPage() {
   return (
     <>
       <Helmet>

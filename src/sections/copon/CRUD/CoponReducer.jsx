@@ -2,78 +2,81 @@ import axios from 'axios';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 const baseUrl = import.meta.env.VITE_BASE_API_URL;
+const token = localStorage.getItem('userToken');
 
 // eslint-disable-next-line arrow-body-style
 export const getCoupons = createAsyncThunk('coupons/getCoupons', () => {
   return axios.get(`${baseUrl}/coupon`).then((res) => res.data.coupon);
 });
 
-export const updateCoupon = createAsyncThunk('coupons/updateCoupon', ({ id, name, amount }) => {
-  // eslint-disable-next-line no-debugger
+export const updateCoupon = createAsyncThunk(
+  'coupons/updateCoupon',
+  async ({ id, name, amount }, { rejectWithValue }) => {
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('amount', amount);
 
-  const token = import.meta.env.VITE_BASE_JWT_TOKEN;
+    const headers = {
+      'Content-Type': 'multipart/form-data', // Set the Content-Type header
+      Authorization: token, // Set the Authorization header
+    };
 
-  const formData = new FormData();
-  formData.append('name', name);
-  formData.append('amount', amount);
+    // Define request configuration object
+    const config = {
+      method: 'put',
+      url: `${baseUrl}/coupon/${id}`,
+      headers,
+      data: formData,
+    };
 
-  const headers = {
-    'Content-Type': 'multipart/form-data', // Set the Content-Type header
-    Authorization: token, // Set the Authorization header
-  };
+    console.log(config);
 
-  // Define request configuration object
-  const config = {
-    method: 'put',
-    url: `${baseUrl}/coupon/${id}`,
-    headers,
-    data: formData,
-  };
+    try {
+      const response = await axios(config);
+      if (response.status === 200 || response.status === 201 || response.status === 202) {
+        return response.data;
+      }
+      throw new Error(response.data);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
 
-  console.log(config);
+export const addCoupon = createAsyncThunk(
+  'coupons/addCoupon',
+  async ({ name, amount, expireDate }, { rejectWithValue }) => {
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('amount', amount);
+    formData.append('expireIn', expireDate);
 
-  axios(config)
-    .then((response) => {
-      console.log('Response:', response);
-    })
-    .catch((error) => {
-      console.error('Error:', error);
-    });
-});
+    const headers = {
+      'Content-Type': 'multipart/form-data',
+      Authorization: token,
+    };
 
-export const addCoupon = createAsyncThunk('coupons/addCoupon', ({ name, amount, expireDate }) => {
-  // eslint-disable-next-line no-debugger
-  debugger;
-  const token = import.meta.env.VITE_BASE_JWT_TOKEN;
+    const config = {
+      method: 'post',
+      url: `${baseUrl}/coupon`,
+      headers,
+      data: formData,
+    };
 
-  const formData = new FormData();
-  formData.append('name', name);
-  formData.append('amount', amount);
-  formData.append('expireIn', expireDate);
+    console.log(config);
 
-  const headers = {
-    'Content-Type': 'multipart/form-data',
-    Authorization: token,
-  };
-
-  const config = {
-    method: 'post',
-    url: `${baseUrl}/coupon`,
-    headers,
-    data: formData,
-  };
-
-  console.log(config);
-
-  // Send the request using Axios
-  axios(config)
-    .then((response) => {
-      console.log('Response:', response);
-    })
-    .catch((error) => {
-      console.error('Error:', error);
-    });
-});
+    // Send the request using Axios
+    try {
+      const response = await axios(config);
+      if (response.status === 200 || response.status === 201 || response.status === 202) {
+        return response.data;
+      }
+      throw new Error(response.data);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
 
 const initialState = {
   coupons: [],
@@ -85,43 +88,7 @@ const initialState = {
 const couponSlice = createSlice({
   name: 'coupons',
   initialState,
-  reducers: {
-    addCoupon: (state, action) => {
-      // eslint-disable-next-line no-debugger
-      debugger;
-
-      const { name, amount, expireDate } = action.payload;
-      const token = import.meta.env.VITE_BASE_JWT_TOKEN;
-
-      const formData = new FormData();
-      formData.append('name', name);
-      formData.append('amount', amount);
-      formData.append('expireIn', expireDate);
-
-      const headers = {
-        'Content-Type': 'multipart/form-data',
-        Authorization: token,
-      };
-
-      const config = {
-        method: 'post',
-        url: `${baseUrl}/coupon`,
-        headers,
-        data: formData,
-      };
-
-      console.log(config);
-
-      // Send the request using Axios
-      axios(config)
-        .then((response) => {
-          console.log('Response:', response);
-        })
-        .catch((error) => {
-          console.error('Error:', error);
-        });
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder.addCase(addCoupon.fulfilled, (state, action) => {
       state.status = 'idle';

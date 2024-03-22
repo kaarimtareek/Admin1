@@ -85,13 +85,6 @@ function BrandHome() {
                     <Link to={`/BrandUpdate/${brand._id}`} className="btn btn-sm btn-primary">
                       Edit
                     </Link>
-
-                    <button
-                      onClick={() => handleDelete(brand._id)}
-                      className="btn btn-sm btn-danger ms-2"
-                    >
-                      Delete
-                    </button>
                   </div>
                 </td>
               </tr>

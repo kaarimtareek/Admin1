@@ -1,5 +1,5 @@
 /* eslint-disable react/button-has-type */
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import React, { useEffect } from 'react';
 import { Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -9,10 +9,10 @@ import { Button } from '@mui/material';
 
 import Iconify from 'src/components/iconify/iconify';
 
-import { getsubBlogs } from './SubblogReducer';
+import { getsubBlogs } from 'src/sections/sub-blog/CRUD/SubblogReducer';
 
-function SubblogHome() {
-  // eslint-disable-next-line no-debugger
+function BlogShowSubBlogs() {
+  const { id } = useParams();
 
   const subBlogsState = useSelector((state) => state.subBlogs);
 
@@ -23,9 +23,9 @@ function SubblogHome() {
 
   useEffect(() => {
     if (subBlogsState.status === 'idle') {
-      dispatch(getsubBlogs());
+      dispatch(getsubBlogs(id));
     }
-  }, [subBlogsState.status, dispatch]);
+  }, [subBlogsState.status, dispatch, id]);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -90,22 +90,7 @@ function SubblogHome() {
     );
   }
 
-  return (
-    <div className="container">
-      <h2>Sub-Category Page</h2>
-      <Button
-        variant="contained"
-        color="primary"
-        component={Link}
-        to="/SubblogCreate"
-        startIcon={<Iconify icon="eva:plus-fill" />}
-      >
-        Create
-      </Button>
-
-      {content}
-    </div>
-  );
+  return <div className="container">{content}</div>;
 }
 
-export default SubblogHome;
+export default BlogShowSubBlogs;

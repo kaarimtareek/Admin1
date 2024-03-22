@@ -1,7 +1,19 @@
-// ----------------------------------------------------------------------
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { jwtDecode } from 'jwt-decode';
+// eslint-disable-next-line no-debugger
+debugger;
 
-export const account = {
-  displayName: 'Mahmoud Rafaat ',
-  email: 'demo@minimals.cc',
+const account = {
+  displayName: 'temp',
+  email: 'temp',
   photoURL: '/assets/images/avatars/avatar_25.jpg',
 };
+
+const token = localStorage.getItem('userToken');
+if (token !== null) {
+  const decoded = jwtDecode(token);
+  account.displayName = decoded.email;
+  account.email = decoded.email;
+}
+
+export { account };

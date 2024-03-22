@@ -2,11 +2,10 @@ import axios from 'axios';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 const baseUrl = import.meta.env.VITE_BASE_API_URL;
+const token = localStorage.getItem('userToken');
 
 // eslint-disable-next-line arrow-body-style
 export const getProducts = createAsyncThunk('products/getProducts', async () => {
-  const token = import.meta.env.VITE_BASE_JWT_TOKEN;
-
   return axios
     .get(`${baseUrl}/product`, {
       headers: {
@@ -16,67 +15,135 @@ export const getProducts = createAsyncThunk('products/getProducts', async () => 
     .then((res) => res.data.products);
 });
 
-export const updateProduct = createAsyncThunk('brands/updateProduct', async ({ id, name, img }) => {
-  // eslint-disable-next-line no-debugger
-  debugger;
+export const updateProduct = createAsyncThunk(
+  'brands/updateProduct',
+  async (
+    { id, name, mainImage, subImages, price, stock, discount, sizes, colors },
+    { rejectWithValue }
+  ) => {
+    const formData = new FormData();
+    formData.append('name', name);
+    if (mainImage !== null) {
+      formData.append('mainImage', mainImage);
+    }
+    if (subImages.length > 0) {
+      subImages.forEach((subImage) => {
+        formData.append('subImage', subImage);
+      });
+    }
 
-  const token = import.meta.env.VITE_BASE_JWT_TOKEN;
+    formData.append('price', parseInt(price, 10));
+    formData.append('stock', parseInt(stock, 10));
+    if (parseInt(discount, 10) > 0) {
+      formData.append('discount', parseInt(discount, 10));
+    }
 
-  const formData = new FormData();
-  formData.append('name', name);
-  if (img !== null) {
-    formData.append('file', img);
+    if (colors.length > 0) {
+      formData.append('colors', colors.join(','));
+    }
+    if (sizes.length > 0) {
+      formData.append('size', sizes.join(','));
+    }
+
+    const headers = {
+      'Content-Type': 'multipart/form-data',
+      Authorization: token,
+    };
+
+    const config = {
+      method: 'put',
+      url: `${baseUrl}/product/${id}`,
+      headers,
+      data: formData,
+    };
+
+    console.log(config.data);
+
+    // Send the request using Axios
+    try {
+      const response = await axios(config);
+      if (response.status === 200 || response.status === 201 || response.status === 202) {
+        return response.data;
+      }
+      throw new Error(response.data);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
   }
+);
 
-  const headers = {
-    'Content-Type': 'multipart/form-data',
-    Authorization: token,
-  };
+export const addProduct = createAsyncThunk(
+  'brands/addProduct',
+  async (
+    {
+      name,
+      mainImage,
+      subImages,
+      price,
+      stock,
+      categoryId,
+      brandId,
+      subCategoryId,
+      discount,
+      sizes,
+      colors,
+    },
+    { rejectWithValue }
+  ) => {
+    const formData = new FormData();
+    formData.append('name', name);
+    if (mainImage !== null) {
+      formData.append('mainImage', mainImage);
+    }
+    if (subImages.length > 0) {
+      subImages.forEach((subImage) => {
+        formData.append('subImage', subImage);
+      });
+    }
 
-  const config = {
-    method: 'put',
-    url: `${baseUrl}/category/${id}`,
-    headers,
-    data: formData,
-  };
+    formData.append('categoryId', categoryId);
+    formData.append('subCategoryId', subCategoryId);
+    formData.append('brandId', brandId);
 
-  console.log(config);
+    formData.append('price', parseInt(price, 10));
+    formData.append('stock', parseInt(stock, 10));
+    if (parseInt(discount, 10) > 0) {
+      formData.append('discount', parseInt(discount, 10));
+    }
 
-  // Send the request using Axios
-  const response = await axios(config);
-  console.log(response);
-});
+    if (colors.length > 0) {
+      formData.append('colors', colors.join(','));
+    }
+    if (sizes.length > 0) {
+      formData.append('size', sizes.join(','));
+    }
 
-export const addProduct = createAsyncThunk('brands/addProduct', async ({ name, img }) => {
-  // eslint-disable-next-line no-debugger
-  debugger;
+    const headers = {
+      'Content-Type': 'multipart/form-data',
+      Authorization: token,
+    };
 
-  const token = import.meta.env.VITE_BASE_JWT_TOKEN;
+    const config = {
+      method: 'post',
+      url: `${baseUrl}/product`,
+      headers,
+      data: formData,
+    };
 
-  const formData = new FormData();
-  formData.append('name', name);
-  if (img !== null) {
-    formData.append('file', img);
+    console.log(config.data);
+
+    // Send the request using Axios
+    try {
+      const response = await axios(config);
+      if (response.status === 200 || response.status === 201 || response.status === 202) {
+        return response.data;
+      }
+      throw new Error(response.data);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
   }
-
-  const headers = {
-    'Content-Type': 'multipart/form-data',
-    Authorization: token,
-  };
-
-  const config = {
-    method: 'post',
-    url: `${baseUrl}/category`,
-    headers,
-    data: formData,
-  };
-
-  console.log(config);
-
-  // Send the request using Axios
-  const response = await axios(config);
-  console.log(response);
-});
+);
 
 const initialState = {
   products: [],
