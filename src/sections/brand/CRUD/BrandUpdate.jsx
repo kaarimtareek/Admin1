@@ -33,12 +33,20 @@ function BrandUpdate() {
         name: uname,
         img: uimg,
       })
-    ).then(() => {
-      console.log();
-      setSuccessMessage('Brand updated successfully!');
-      setTimeout(() => {
-        setSuccessMessage('');
-      }, 3000);
+    ).then((res) => {
+      if (res.meta.requestStatus === 'fulfilled') {
+        setSuccessMessage('brand has been updated successfully!');
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 3000);
+      } else {
+        const errors = res.payload.response.data.details;
+        let errorMessage = '';
+        errors.forEach((error) => {
+          errorMessage += error.message;
+        });
+        alert(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
+      }
     });
   };
 

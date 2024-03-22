@@ -34,11 +34,20 @@ function CoponCreate() {
 
     console.log(newCopon);
 
-    dispatch(addCoupon(newCopon)).then(() => {
-      setSuccessMessage('A new copon has been created successfully');
-      setTimeout(() => {
-        setSuccessMessage('');
-      }, 3000);
+    dispatch(addCoupon(newCopon)).then((res) => {
+      if (res.meta.requestStatus === 'fulfilled') {
+        setSuccessMessage('copon has been created successfully!');
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 3000);
+      } else {
+        const errors = res.payload.response.data.details;
+        let errorMessage = '';
+        errors.forEach((error) => {
+          errorMessage += `${error.message}\n`;
+        });
+        alert(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
+      }
     });
 
     setName('');

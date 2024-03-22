@@ -6,20 +6,22 @@ import Container from '@mui/material/Container';
 import BlogHome from '../CRUD/BlogHome';
 import BlogCreate from '../CRUD/BlogCreate';
 import BlogUpdate from '../CRUD/BlogUpdate';
+import BlogCreateSubBlog from '../CRUD/BlogCreateSubBlog';
+import BlogShowSubBlogs from '../CRUD/BlogShowSubBlogs';
 // ----------------------------------------------------------------------
 
 export default function BlogView() {
   return (
     <Container>
-    <Routes>
-      <Route path="/" element={<BlogHome />} />
-      <Route path="/Usercreate" element={<BlogCreate />} />
-      <Route path="/UserUpdate" element={<BlogUpdate />} />
+      <Routes>
+        <Route path="/" element={<BlogHome />} />
+        <Route path="/BlogCreate" element={<BlogCreate />} />
+        <Route path="/BlogUpdate" element={<BlogUpdate />} />
+        <Route path="/BlogCreateSubCategory" element={<BlogCreateSubBlog />} />
+        <Route path="/BlogShowSubCategories" element={<BlogShowSubBlogs />} />
 
-      {/* Add more routes as needed */}
-    </Routes>
+        {/* Add more routes as needed */}
+      </Routes>
     </Container>
   );
 }
-
-

@@ -30,11 +30,20 @@ function BrandCreate() {
       img,
     };
 
-    dispatch(addBrand(newBrand)).then(() => {
-      setSuccessMessage('A new copon has been created successfully');
-      setTimeout(() => {
-        setSuccessMessage('');
-      }, 3000);
+    dispatch(addBrand(newBrand)).then((res) => {
+      if (res.meta.requestStatus === 'fulfilled') {
+        setSuccessMessage('brand has been created successfully!');
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 3000);
+      } else {
+        const errors = res.payload.response.data.details;
+        let errorMessage = '';
+        errors.forEach((error) => {
+          errorMessage += error.message;
+        });
+        alert(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
+      }
     });
   };
 

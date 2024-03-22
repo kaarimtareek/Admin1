@@ -1,14 +1,15 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useParams, Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 
-import { addSubBlog } from './SubblogReducer';
+import { addSubBlog } from 'src/sections/sub-blog/CRUD/SubblogReducer';
 
-function SubblogCreate() {
+function BlogCreateSubBlog() {
+  const { id } = useParams();
+
   const [name, setName] = useState('');
-  const [categoryId, setCategoryId] = useState('');
   // eslint-disable-next-line no-unused-vars
   const [img, setImg] = useState(null); // State to store the selected image file
   const [imgPreview, setImgPreview] = useState(null); // State to store the base64 image preview
@@ -26,15 +27,25 @@ function SubblogCreate() {
     }
 
     const newSubBlog = {
+      id,
       name,
       img,
     };
 
-    dispatch(addSubBlog(newSubBlog)).then(() => {
-      setSuccessMessage('a new category has been created successfully!');
-      setTimeout(() => {
-        setSuccessMessage('');
-      }, 3000);
+    dispatch(addSubBlog(newSubBlog)).then((res) => {
+      if (res.meta.requestStatus === 'fulfilled') {
+        setSuccessMessage('a new  subcategory has been created successfully!');
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 3000);
+      } else {
+        const errors = res.payload.response.data.details;
+        let errorMessage = '';
+        errors.forEach((error) => {
+          errorMessage += error.message;
+        });
+        alert(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
+      }
     });
   };
 
@@ -69,6 +80,7 @@ function SubblogCreate() {
               onChange={(e) => setName(e.target.value)}
             />
           </div>
+
           <div>
             <label htmlFor="img">Image:</label>
             <input
@@ -79,18 +91,12 @@ function SubblogCreate() {
               onChange={handleFileChange}
             />
           </div>
-          <div>
-            <label htmlFor="catrgoryId">Category Id:</label>
-            <input
-              type="text"
-              id="categoryId"
-              name="categoryId"
-              className="form-control"
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
-            />
-          </div>
+
           <br />
+          <Link to="/SubblogHome" className="btn btn-sm btn-primary mx-1">
+            Go To subCategories
+          </Link>
+
           <button type="submit" className="btn btn-info">
             Submit
           </button>
@@ -100,4 +106,4 @@ function SubblogCreate() {
   );
 }
 
-export default SubblogCreate;
+export default BlogCreateSubBlog;

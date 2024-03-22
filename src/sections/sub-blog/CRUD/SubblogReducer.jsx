@@ -2,77 +2,80 @@ import axios from 'axios';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 const baseUrl = import.meta.env.VITE_BASE_API_URL;
+const token = localStorage.getItem('userToken');
 // eslint-disable-next-line arrow-body-style
-export const getsubBlogs = createAsyncThunk('subblogs/getsubBlogs', () => {
-  return axios
-    .get(`${baseUrl}/category/65d491ae7d597cdac7f67bf6/subcategory`)
-    .then((res) => res.data.subCategories);
+export const getsubBlogs = createAsyncThunk('subblogs/getsubBlogs', (id, { dispatch }) => {
+  return axios.get(`${baseUrl}/category/subcategories/all`).then((res) => res.data.subCategories);
 });
 
-export const updateSubblog = createAsyncThunk('brands/updateSubblog', ({ id, name, img }) => {
-  // eslint-disable-next-line no-debugger
-  debugger;
+export const updateSubblog = createAsyncThunk(
+  'brands/updateSubblog',
+  async ({ id, name, img }, { rejectWithValue }) => {
+    const formData = new FormData();
+    formData.append('name', name);
+    if (img !== null) {
+      formData.append('file', img);
+    }
 
-  const token = import.meta.env.VITE_BASE_JWT_TOKEN;
+    const headers = {
+      'Content-Type': 'multipart/form-data',
+      Authorization: token,
+    };
 
-  const formData = new FormData();
-  formData.append('name', name);
-  if (img !== null) {
-    formData.append('file', img);
+    const config = {
+      method: 'put',
+      url: `${baseUrl}/category/65d491ae7d597cdac7f67bf6/subcategory/${id}`,
+      headers,
+      data: formData,
+    };
+
+    console.log(config);
+
+    // Send the request using Axios
+    try {
+      const response = await axios(config);
+      if (response.status === 200 || response.status === 201 || response.status === 202) {
+        return response.data;
+      }
+      throw new Error(response.data);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
   }
+);
 
-  const headers = {
-    'Content-Type': 'multipart/form-data',
-    Authorization: token,
-  };
+export const addSubBlog = createAsyncThunk(
+  'blogs/addSubblog',
+  async ({ id, name, img }, { rejectWithValue }) => {
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('file', img);
 
-  const config = {
-    method: 'put',
-    url: `${baseUrl}/category/65d491ae7d597cdac7f67bf6/subcategory/${id}`,
-    headers,
-    data: formData,
-  };
+    const headers = {
+      'Content-Type': 'multipart/form-data',
+      Authorization: token,
+    };
 
-  console.log(config);
+    const config = {
+      method: 'post',
+      url: `${baseUrl}/category/${id}/subcategory`,
+      headers,
+      data: formData,
+    };
 
-  // Send the request using Axios
-  axios(config)
-    .then((response) => {
-      console.log('Response:', response);
-    })
-    .catch((error) => {
-      console.log('Error:', error);
-    });
-});
+    console.log(config);
 
-export const addSubBlog = createAsyncThunk('brands/addSubblog', async ({ name, img }) => {
-  // eslint-disable-next-line no-debugger
-  debugger;
-
-  const token = import.meta.env.VITE_BASE_JWT_TOKEN;
-
-  const formData = new FormData();
-  formData.append('name', name);
-  formData.append('file', img);
-
-  const headers = {
-    'Content-Type': 'multipart/form-data',
-    Authorization: token,
-  };
-
-  const config = {
-    method: 'post',
-    url: `${baseUrl}/category/65d491ae7d597cdac7f67bf6/subcategory`,
-    headers,
-    data: formData,
-  };
-
-  console.log(config);
-
-  // Send the request using Axios
-  const response = await axios(config);
-  console.log(response);
-});
+    try {
+      const response = await axios(config);
+      if (response.status === 200 || response.status === 201 || response.status === 202) {
+        return response.data;
+      }
+      throw new Error(response.data);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
 
 const initialState = {
   subBlogs: [],
@@ -99,7 +102,6 @@ const subblogSlice = createSlice({
       console.log('loading now is true');
     });
     builder.addCase(getsubBlogs.fulfilled, (state, action) => {
-      // eslint-disable-next-line no-debugger
       state.loading = false;
       console.log('loading now is true fulfilled');
       state.status = 'fulfilled';

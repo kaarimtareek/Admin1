@@ -1,14 +1,14 @@
 import { Helmet } from 'react-helmet-async';
 
-import CoponView from 'src/sections/copon/view/copon-view';
+import OrderView from 'src/sections/order/view/order-view';
 // ----------------------------------------------------------------------
-export default function CoponPage() {
+export default function OrderPage() {
   return (
     <>
       <Helmet>
-        <title> Copon CLOZR</title>
+        <title> Order CLOZR</title>
       </Helmet>
-      <CoponView />
+      <OrderView />
     </>
   );
 }

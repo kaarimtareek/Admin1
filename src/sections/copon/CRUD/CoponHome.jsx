@@ -1,15 +1,15 @@
 /* eslint-disable react/button-has-type */
+import { Link } from 'react-router-dom';
 import React, { useEffect } from 'react';
 import { Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Button } from '@mui/material';
 
 import Iconify from 'src/components/iconify/iconify';
 
-import { getCoupons, deleteCoupon } from './CoponReducer';
+import { getCoupons } from './CoponReducer';
 
 function CouponHome() {
   const couponState = useSelector((state) => state.coupons);
@@ -25,13 +25,6 @@ function CouponHome() {
     }
   }, [couponState.status, dispatch]);
 
-  const navigate = useNavigate();
-
-  const handleDelete = (id) => {
-    console.log('Deleting coupon with ID:', id);
-    dispatch(deleteCoupon({ id }));
-    navigate('/CouponHome');
-  };
 
   function convertUtcToLocal(utcTimeString) {
     const utcDate = new Date(utcTimeString);
@@ -73,13 +66,6 @@ function CouponHome() {
                     <Link to={`/CoponUpdate/${coupon._id}`} className="btn btn-sm btn-primary">
                       Edit
                     </Link>
-
-                    <button
-                      onClick={() => handleDelete(coupon._id)}
-                      className="btn btn-sm btn-danger ms-2"
-                    >
-                      Delete
-                    </button>
                   </div>
                 </td>
               </tr>

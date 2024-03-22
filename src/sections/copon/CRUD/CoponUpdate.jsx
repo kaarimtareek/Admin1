@@ -30,11 +30,20 @@ function CoponUpdate() {
         name: uname,
         amount: uamount,
       })
-    ).then(() => {
-      setSuccessMessage('copon has been updated successfully!');
-      setTimeout(() => {
-        setSuccessMessage('');
-      }, 3000); // Hide the success message after 3 seconds
+    ).then((res) => {
+      if (res.meta.requestStatus === 'fulfilled') {
+        setSuccessMessage('coupon has been updated successfully!');
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 3000);
+      } else {
+        const errors = res.payload.response.data.details;
+        let errorMessage = '';
+        errors.forEach((error) => {
+          errorMessage += `${error.message}\n`;
+        });
+        alert(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
+      }
     });
   };
   return (
@@ -53,7 +62,6 @@ function CoponUpdate() {
               name="name"
               className="form-control"
               value={uname}
-              placeholder={coupon.name}
               onChange={(e) => setName(e.target.value)}
             />
           </div>
@@ -66,7 +74,6 @@ function CoponUpdate() {
               name="amount"
               className="form-control"
               value={uamount}
-              placeholder={coupon.amount}
               onChange={(e) => setAmount(e.target.value)}
             />
           </div>

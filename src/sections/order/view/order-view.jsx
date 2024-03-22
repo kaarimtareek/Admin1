@@ -2,18 +2,15 @@ import React from 'react';
 import { Container } from 'react-bootstrap';
 import { Route, Routes } from 'react-router-dom';
 
-import BrandHome from '../CRUD/BrandHome';
-import BrandCreate from '../CRUD/BrandCreate';
-import BrandUpdate from '../CRUD/BrandUpdate';
+import OrderHome from '../CRUD/OrderHome';
 // ----------------------------------------------------------------------
 
-export default function BrandView() {
+export default function OrderPage() {
   return (
     <Container>
       <Routes>
-        <Route path="/" element={<BrandHome />} />
-        <Route path="/BrandCreate" element={<BrandCreate />} />
-        <Route path="/BrandUpdate" element={<BrandUpdate />} />
+        <Route path="/" element={<OrderHome />} />
+        {/* <Route path="/CoponUpdate" element={<CoponUpdate />} /> */}
 
         {/* Add more routes as needed */}
       </Routes>

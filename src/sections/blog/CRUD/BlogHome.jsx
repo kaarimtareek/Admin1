@@ -24,7 +24,7 @@ function BlogHome() {
       dispatch(getBlogs());
     }
   }, [blogsState.status, dispatch]);
-  
+
   const navigate = useNavigate();
   // eslint-disable-next-line no-unused-vars
   const [img, setImage] = useState(null);
@@ -84,16 +84,21 @@ function BlogHome() {
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     {/* <Link to={`/BlogUpdate/${blogList.id}`} className='btn btn-sm btn-primary'>Edit</Link> */}
+                    {/* <Link
+                      to={`/BlogShowSubCategories/${blog._id}`}
+                      className="btn btn-sm btn-primary mx-1"
+                    >
+                      Show SubCategories
+                    </Link> */}
+                    <Link
+                      to={`/BlogCreateSubCategory/${blog._id}`}
+                      className="btn btn-sm btn-primary mx-1"
+                    >
+                      Add SubCategory
+                    </Link>
                     <Link to={`/BlogUpdate/${blog._id}`} className="btn btn-sm btn-primary">
                       Edit
                     </Link>
-
-                    <button
-                      onClick={() => handleDelete(blog._id)}
-                      className="btn btn-sm btn-danger ms-2"
-                    >
-                      Delete
-                    </button>
                   </div>
                 </td>
               </tr>
