@@ -93,16 +93,6 @@ function SubblogHome() {
   return (
     <div className="container">
       <h2>Sub-Category Page</h2>
-      <Button
-        variant="contained"
-        color="primary"
-        component={Link}
-        to="/SubblogCreate"
-        startIcon={<Iconify icon="eva:plus-fill" />}
-      >
-        Create
-      </Button>
-
       {content}
     </div>
   );
