@@ -17,23 +17,30 @@ export const getUsers = createAsyncThunk('users/getUsers', () => {
 
 export const updateUser = createAsyncThunk(
   'brands/updateUser',
-  async ({ id, name, img }, { rejectWithValue }) => {
-    const formData = new FormData();
-    formData.append('name', name);
-    if (img !== null) {
-      formData.append('file', img);
-    }
-
+  async (updatedUser, { rejectWithValue }) => {
     const headers = {
-      'Content-Type': 'multipart/form-data',
+      'Content-Type': 'application/json',
       Authorization: token,
     };
-
+    // eslint-disable-next-line no-debugger
+    debugger;
+    const { id } = updatedUser;
+    const { userName, mobileNumber, DOB } = updatedUser;
+    const body = {};
+    if (userName !== '') {
+      body.userName = userName;
+    }
+    if (mobileNumber !== '') {
+      body.mobileNumber = mobileNumber;
+    }
+    if (DOB !== '') {
+      body.DOB = DOB.slice(0, 10);
+    }
     const config = {
       method: 'put',
-      url: `${baseUrl}/category/${id}`,
+      url: `${baseUrl}/user/${id}`,
       headers,
-      data: formData,
+      data: body,
     };
 
     console.log(config);

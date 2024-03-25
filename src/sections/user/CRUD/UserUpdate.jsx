@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,25 +12,35 @@ function UserUpdate() {
   // eslint-disable-next-line eqeqeq
   const existingUser = usersState.users.find((f) => f._id === id);
   console.log(existingUser);
+
+  // Initialize state for username, mobile number, and DOB
   const [uname, setName] = useState(existingUser.userName);
+  const [mobile, setMobile] = useState(existingUser.mobileNumber || '');
+  const [dob, setDOB] = useState(existingUser.DOB || '');
+  const email = existingUser.email;
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleUpdate = (event) => {
     event.preventDefault();
-    dispatch(
-      updateUser({
-        uname,
-      })
-    ).then((res) => {
+    // Validate mobile number and DOB format here if needed
+    // For simplicity, assuming format validation is done on the backend
+
+    const userToBeUpdated = {
+      id,
+      userName: uname,
+      mobileNumber: mobile,
+      DOB: dob,
+    };
+    // Pass updated user data to the updateUser function
+    dispatch(updateUser(userToBeUpdated)).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
-        alert('user has been updated successfully!');
+        alert('User has been updated successfully!');
       } else {
         alert(`${res.payload.response.data.globalMessage}`);
       }
     });
-    navigate('/UserHome');
   };
 
   return (
@@ -38,7 +49,6 @@ function UserUpdate() {
         <h3>Update User</h3>
         <form onSubmit={handleUpdate}>
           <div>
-            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
             <label htmlFor="name">Username:</label>
             <input
               type="text"
@@ -47,6 +57,43 @@ function UserUpdate() {
               className="form-control"
               value={uname}
               onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="email">Email :</label>
+            <input
+              type="text"
+              id="email"
+              disabled
+              name="email"
+              className="form-control"
+              placeholder={email}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="mobile">Mobile Number:</label>
+            <input
+              type="text"
+              id="mobile"
+              name="mobile"
+              className="form-control"
+              value={mobile}
+              onChange={(e) => setMobile(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="dob">Date of Birth (YYYY-MM-DD):</label>
+            <input
+              type="date"
+              pattern="\d{4}-\d{2}-\d{2}"
+              id="dob"
+              name="dob"
+              className="form-control"
+              value={dob}
+              onChange={(e) => setDOB(e.target.value)}
             />
           </div>
 
