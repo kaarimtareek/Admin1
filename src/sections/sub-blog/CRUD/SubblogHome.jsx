@@ -122,7 +122,6 @@ function SubblogHome() {
   return (
     <div className="container">
       <h2>Sub-Category Page</h2>
-
       {content}
     </div>
   );
