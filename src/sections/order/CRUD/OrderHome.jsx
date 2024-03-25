@@ -93,10 +93,8 @@ function OrderHome() {
             <th>Phone</th>
             <th>Payment Type</th>
             <th>Final Price</th>
-            <th>Sub Price</th>
             <th>Status</th>
             <th>Created At</th>
-            <th>Updated At</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -110,16 +108,14 @@ function OrderHome() {
                 <td>{order.phone}</td>
                 <td>{order.paymentTypes}</td>
                 <td>{order.finalPrice}</td>
-                <td>{order.subPrice}</td>
                 <td>{order.status}</td>
                 <td>{convertUtcToLocal(order.createdAt)}</td>
-                <td>{convertUtcToLocal(order.updatedAt)}</td>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     {/* <Link to={`/OrderUpdate/${order._id}`} className="btn btn-sm btn-primary">
                       Edit
                     </Link> */}
-                    
+
                     <button
                       onClick={() => handleRejection(order._id)}
                       className="btn btn-sm btn-danger ms-2"

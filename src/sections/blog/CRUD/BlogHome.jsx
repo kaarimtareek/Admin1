@@ -30,8 +30,19 @@ function BlogHome() {
   const [img, setImage] = useState(null);
 
   const handleDelete = (id) => {
+    // eslint-disable-next-line no-debugger
+    debugger;
     console.log('Deleting blog with ID:', id);
-    dispatch(deleteBlog({ id }));
+    dispatch(deleteBlog(id)).then((res) => {
+      if (res.meta.requestStatus === 'fulfilled') {
+        alert('Blog has been deleted successfully!');
+      } else {
+        alert('an error has occured');
+      }
+    });
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
     navigate('/BlogHome');
   };
 
@@ -99,6 +110,12 @@ function BlogHome() {
                     <Link to={`/BlogUpdate/${blog._id}`} className="btn btn-sm btn-primary">
                       Edit
                     </Link>
+                    <button
+                      className="btn btn-sm btn-danger mx-1"
+                      onClick={() => handleDelete(blog._id)}
+                    >
+                      Delete
+                    </button>
                   </div>
                 </td>
               </tr>

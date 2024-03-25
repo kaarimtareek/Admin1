@@ -28,7 +28,19 @@ function BrandHome() {
   // eslint-disable-next-line no-unused-vars
   const [img, setImage] = useState(null);
   const handleDelete = (id) => {
-    dispatch(deleteBrand({ id }));
+    // eslint-disable-next-line no-debugger
+    debugger;
+    console.log('Deleting blog with ID:', id);
+    dispatch(deleteBrand(id)).then((res) => {
+      if (res.meta.requestStatus === 'fulfilled') {
+        alert('brand has been deleted successfully!');
+      } else {
+        alert('an error has occured');
+      }
+    });
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
     navigate('/BrandHome');
   };
   const handleImageUpload = (event) => {
@@ -85,6 +97,12 @@ function BrandHome() {
                     <Link to={`/BrandUpdate/${brand._id}`} className="btn btn-sm btn-primary">
                       Edit
                     </Link>
+                    <button
+                      className="btn btn-sm btn-danger mx-1"
+                      onClick={() => handleDelete(brand._id)}
+                    >
+                      Delete
+                    </button>
                   </div>
                 </td>
               </tr>

@@ -12,7 +12,7 @@ const account = {
 const token = localStorage.getItem('userToken');
 if (token !== null) {
   const decoded = jwtDecode(token);
-  account.displayName = decoded.email;
+  account.displayName = decoded.name;
   account.email = decoded.email;
 }
 

@@ -18,6 +18,8 @@ function ProductHome() {
   const dispatch = useDispatch();
   const [primImg, setPrimImage] = useState(null);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (productsState.status === 'idle') {
       dispatch(getProducts());
@@ -35,6 +37,23 @@ function ProductHome() {
     if (file) {
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleDelete = (id) => {
+    // eslint-disable-next-line no-debugger
+    debugger;
+    console.log('Deleting blog with ID:', id);
+    dispatch(deleteProduct(id)).then((res) => {
+      if (res.meta.requestStatus === 'fulfilled') {
+        alert('product has been deleted successfully!');
+      } else {
+        alert('an error has occured');
+      }
+    });
+    setTimeout(() => {
+      window.location.reload();
+    }, 3000);
+    navigate('/ProductHome');
   };
 
   let content;
@@ -58,9 +77,9 @@ function ProductHome() {
             <th>Category</th>
             <th>SubCategory</th>
             <th>Brand</th>
-            <th>Discount</th>
+            {/* <th>Discount</th>
             <th>Sizes</th>
-            <th>Colors</th>
+            <th>Colors</th> */}
             <th>Action</th>
           </tr>
         </thead>
@@ -84,18 +103,24 @@ function ProductHome() {
                 </td>
                 <td>{product.price}</td>
                 <td>{product.stock}</td>
-                <td>{product.categoryId.name}</td>
-                <td>{product.subCategoryId.name}</td>
-                <td>{product.brandId.name}</td>
-                <td>{product.discount}</td>
+                <td>{product.categoryId?.name}</td>
+                <td>{product.subCategoryId?.name}</td>
+                <td>{product.brandId?.name}</td>
+                {/* <td>{product.discount}</td>
                 <td>{product.size.join(', ')}</td>
-                <td>{product.colors.join(', ')}</td>
+                <td>{product.colors.join(', ')}</td> */}
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     {/* <Link to={`/BlogUpdate/${blogList.id}`} className='btn btn-sm btn-primary'>Edit</Link> */}
                     <Link to={`/ProductUpdate/${product._id}`} className="btn btn-sm btn-primary">
                       Edit
                     </Link>
+                    <button
+                      className="btn btn-sm btn-danger mx-1"
+                      onClick={() => handleDelete(product._id)}
+                    >
+                      Delete
+                    </button>
                   </div>
                 </td>
               </tr>

@@ -51,41 +51,36 @@ export const updateUser = createAsyncThunk(
   }
 );
 
-export const addUser = createAsyncThunk(
-  'brands/addUser',
-  async ({ name, img }, { rejectWithValue }) => {
-    const formData = new FormData();
-    formData.append('name', name);
-    if (img !== null) {
-      formData.append('file', img);
+export const addUser = createAsyncThunk('brands/addUser', async (newUser, { rejectWithValue }) => {
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: token,
+  };
+  // eslint-disable-next-line no-debugger
+  debugger;
+
+  const config = {
+    method: 'post',
+    url: `${baseUrl}/auth/signUp`,
+    headers,
+    data: newUser,
+  };
+
+  newUser.role = newUser.role.value;
+
+  console.log(newUser);
+
+  // Send the request using Axios
+  try {
+    const response = await axios(config);
+    if (response.status === 200 || response.status === 201 || response.status === 202) {
+      return response.data;
     }
-
-    const headers = {
-      'Content-Type': 'multipart/form-data',
-      Authorization: token,
-    };
-
-    const config = {
-      method: 'post',
-      url: `${baseUrl}/category`,
-      headers,
-      data: formData,
-    };
-
-    console.log(config);
-
-    // Send the request using Axios
-    try {
-      const response = await axios(config);
-      if (response.status === 200 || response.status === 201 || response.status === 202) {
-        return response.data;
-      }
-      throw new Error(response.data);
-    } catch (error) {
-      return rejectWithValue(error);
-    }
+    throw new Error(response.data);
+  } catch (error) {
+    return rejectWithValue(error);
   }
-);
+});
 
 const initialState = {
   users: [],

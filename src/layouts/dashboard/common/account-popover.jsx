@@ -38,11 +38,14 @@ export default function AccountPopover() {
   };
 
   const handleClose = () => {
+    setOpen(null);
+  };
+
+  function resetToken() {
     localStorage.removeItem('userToken');
     localStorage.removeItem('isLoggedIn');
     window.location.reload();
-    setOpen(null);
-  };
+  }
 
   return (
     <>
@@ -97,18 +100,12 @@ export default function AccountPopover() {
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        {MENU_OPTIONS.map((option) => (
-          <MenuItem key={option.label} onClick={handleClose}>
-            {option.label}
-          </MenuItem>
-        ))}
-
         <Divider sx={{ borderStyle: 'dashed', m: 0 }} />
 
         <MenuItem
           disableRipple
           disableTouchRipple
-          onClick={handleClose}
+          onClick={() => resetToken()}
           sx={{ typography: 'body2', color: 'error.main', py: 1.5 }}
         >
           Logout

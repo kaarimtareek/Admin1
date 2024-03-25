@@ -10,6 +10,36 @@ export const getBrands = createAsyncThunk('brands/getBrands', () =>
   axios.get(`${baseUrl}/brand`).then((res) => res.data.brand)
 );
 
+export const deleteBrand = createAsyncThunk(
+  'brands/deleteBrand',
+  async (id, { rejectWithValue }) => {
+    const headers = {
+      Authorization: token,
+    };
+
+    const config = {
+      method: 'delete',
+      url: `${baseUrl}/brand/${id}`,
+      headers,
+    };
+
+    console.log(config);
+    // eslint-disable-next-line no-debugger
+    debugger;
+
+    // Send the request using Axios
+    try {
+      const response = await axios(config);
+      if (response.status === 200 || response.status === 201 || response.status === 202) {
+        return response.data;
+      }
+      throw new Error(response.data);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
 export const updateBrand = createAsyncThunk(
   'brands/updateBrand',
   async ({ id, name, img }, { rejectWithValue }) => {
@@ -120,7 +150,6 @@ const brandSlice = createSlice({
     });
   },
 });
-export const { deleteBrand } = brandSlice.actions;
 export const selectAllBrands = (state) => state.brands;
 
 export default brandSlice.reducer;
