@@ -15,6 +15,36 @@ export const getProducts = createAsyncThunk('products/getProducts', async () => 
     .then((res) => res.data.products);
 });
 
+export const deleteProduct = createAsyncThunk(
+  'products/deleteProduct',
+  async (id, { rejectWithValue }) => {
+    // eslint-disable-next-line no-debugger
+    debugger;
+    const headers = {
+      Authorization: token,
+    };
+
+    const config = {
+      method: 'delete',
+      url: `${baseUrl}/product/${id}`,
+      headers,
+    };
+
+    console.log(config);
+
+    // Send the request using Axios
+    try {
+      const response = await axios(config);
+      if (response.status === 200 || response.status === 201 || response.status === 202) {
+        return response.data;
+      }
+      throw new Error(response.data);
+    } catch (error) {
+      return rejectWithValue('error');
+    }
+  }
+);
+
 export const updateProduct = createAsyncThunk(
   'brands/updateProduct',
   async (
@@ -83,6 +113,7 @@ export const addProduct = createAsyncThunk(
       stock,
       categoryId,
       brandId,
+      description,
       subCategoryId,
       discount,
       sizes,
@@ -90,8 +121,11 @@ export const addProduct = createAsyncThunk(
     },
     { rejectWithValue }
   ) => {
+    // eslint-disable-next-line no-debugger
+    debugger;
     const formData = new FormData();
     formData.append('name', name);
+    formData.append('description', description);
     if (mainImage !== null) {
       formData.append('mainImage', mainImage);
     }
@@ -101,9 +135,9 @@ export const addProduct = createAsyncThunk(
       });
     }
 
-    formData.append('categoryId', categoryId);
-    formData.append('subCategoryId', subCategoryId);
-    formData.append('brandId', brandId);
+    formData.append('categoryId', categoryId.value);
+    formData.append('subCategoryId', subCategoryId.value);
+    formData.append('brandId', brandId.value);
 
     formData.append('price', parseInt(price, 10));
     formData.append('stock', parseInt(stock, 10));
@@ -184,6 +218,5 @@ const productSlice = createSlice({
   },
 });
 
-export const { deleteProduct } = productSlice.actions;
 export const selectAllProducts = (state) => state.products;
 export default productSlice.reducer;

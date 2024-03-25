@@ -33,7 +33,7 @@ function SubblogUpdate() {
       })
     ).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
-        setSuccessMessage('category has been updated successfully!');
+        setSuccessMessage('subcategory has been updated successfully!');
         setTimeout(() => {
           setSuccessMessage('');
         }, 3000);
@@ -51,7 +51,7 @@ function SubblogUpdate() {
   return (
     <div className="d-flex w-100 vh-100 justify-content-center align-items-center">
       <div className="w-50 border bg-secondary text-white p-5">
-        <h3>Edit Category</h3>
+        <h3>Edit Sub Category</h3>
         {successMessage && <p style={{ color: '#66ff99' }}>{successMessage}</p>}
 
         <form onSubmit={handleUpdate}>

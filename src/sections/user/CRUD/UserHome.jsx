@@ -46,6 +46,7 @@ function UserHome() {
             <th>Role</th>
             <th>Gender</th>
             <th>Status</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -58,6 +59,11 @@ function UserHome() {
                 <td>{user.role}</td>
                 <td>{user.gender}</td>
                 <td>{user.status}</td>
+                <td>
+                  <Link to={`/UserUpdate/${user._id}`} className="btn btn-sm btn-primary">
+                    Edit
+                  </Link>
+                </td>
               </tr>
             ))}
         </tbody>
@@ -68,7 +74,7 @@ function UserHome() {
   return (
     <div className="container">
       <h2>Users Page</h2>
-      {/* <Button
+      <Button
         variant="contained"
         color="primary"
         component={Link}
@@ -76,7 +82,7 @@ function UserHome() {
         startIcon={<Iconify icon="eva:plus-fill" />}
       >
         Create
-      </Button> */}
+      </Button>
 
       {content}
     </div>

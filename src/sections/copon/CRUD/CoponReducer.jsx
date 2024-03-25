@@ -8,7 +8,37 @@ const token = localStorage.getItem('userToken');
 export const getCoupons = createAsyncThunk('coupons/getCoupons', () => {
   return axios.get(`${baseUrl}/coupon`).then((res) => res.data.coupon);
 });
+export const deleteCoupon = createAsyncThunk(
+  'brands/deleteCoupon',
+  async (id, { rejectWithValue }) => {
+    const headers = {
+      Authorization: token,
+    };
 
+    // eslint-disable-next-line no-debugger
+    debugger;
+    const config = {
+      method: 'delete',
+      url: `${baseUrl}/coupon/${id}`,
+      headers,
+    };
+
+    console.log(config);
+    // eslint-disable-next-line no-debugger
+    debugger;
+
+    // Send the request using Axios
+    try {
+      const response = await axios(config);
+      if (response.status === 200 || response.status === 201 || response.status === 202) {
+        return response.data;
+      }
+      throw new Error(response.data);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
 export const updateCoupon = createAsyncThunk(
   'coupons/updateCoupon',
   async ({ id, name, amount }, { rejectWithValue }) => {
@@ -118,6 +148,5 @@ const couponSlice = createSlice({
   },
 });
 
-export const { deleteCoupon } = couponSlice.actions;
 export const selectAllCoupons = (state) => state.coupons;
 export default couponSlice.reducer;

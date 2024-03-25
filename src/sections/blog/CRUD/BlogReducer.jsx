@@ -53,6 +53,34 @@ export const updateBlog = createAsyncThunk(
   }
 );
 
+export const deleteBlog = createAsyncThunk(
+  'blogs/deleteBlog',
+  async (id , { rejectWithValue }) => {
+    const headers = {
+      Authorization: token,
+    };
+
+    const config = {
+      method: 'delete',
+      url: `${baseUrl}/category/${id}`,
+      headers
+    };
+
+    console.log(config);
+
+    // Send the request using Axios
+    try {
+      const response = await axios(config);
+      if (response.status === 200 || response.status === 201 || response.status === 202) {
+        return response.data;
+      }
+      throw new Error(response.data);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
 export const addSubBlog = createAsyncThunk(
   'blogs/addSubblog',
   async ({ id, name, img }, { rejectWithValue }) => {
@@ -164,6 +192,6 @@ const blogSlice = createSlice({
   },
 });
 
-export const { deleteBlog } = blogSlice.actions;
+
 export const selectAllBlogs = (state) => state.blogs;
 export default blogSlice.reducer;

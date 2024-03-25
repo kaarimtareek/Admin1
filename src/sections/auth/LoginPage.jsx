@@ -19,12 +19,9 @@ const LoginPage = () => {
         localStorage.setItem('isLoggedIn', 'true'); // Store authentication state
         window.location.reload();
       } else {
-        const errors = res.payload.response.data.details;
-        let errorMessage = '';
-        errors.forEach((error) => {
-          errorMessage += `${error.message}\n`;
-        });
-        alert(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
+        const errors = res.payload.response.data?.details;
+        console.log(errors);
+        alert(`${res.payload.response.data.globalMessage}`);
       }
     });
   };

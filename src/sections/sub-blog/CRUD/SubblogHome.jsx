@@ -1,5 +1,5 @@
 /* eslint-disable react/button-has-type */
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import React, { useEffect } from 'react';
 import { Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -9,7 +9,7 @@ import { Button } from '@mui/material';
 
 import Iconify from 'src/components/iconify/iconify';
 
-import { getsubBlogs } from './SubblogReducer';
+import { deleteSubBlog, getsubBlogs } from './SubblogReducer';
 
 function SubblogHome() {
   // eslint-disable-next-line no-debugger
@@ -26,6 +26,29 @@ function SubblogHome() {
       dispatch(getsubBlogs());
     }
   }, [subBlogsState.status, dispatch]);
+
+  const navigate = useNavigate();
+
+  const handleDelete = (parentId, id) => {
+    // if (parentId === undefined) {
+    //   alert('you cannot delete this subcategory');
+    //   return;
+    // }
+    console.log('Deleting blog with ID:', id);
+    dispatch(deleteSubBlog({ parentId, id })).then((res) => {
+      // eslint-disable-next-line no-debugger
+      debugger;
+      if (res.meta.requestStatus === 'fulfilled') {
+        alert('subcategory has been deleted successfully!');
+      } else {
+        alert('an error has occured');
+      }
+    });
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+    navigate('/SubBlogHome');
+  };
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -74,13 +97,19 @@ function SubblogHome() {
                     <input type="file" accept="image/*" onChange={handleImageUpload} />
                   )}
                 </td>
-                <td>{subblog.categoryId.name}</td>
+                <td>{subblog?.categoryId?.name}</td>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     {/* <Link to={`/BlogUpdate/${blogList.id}`} className='btn btn-sm btn-primary'>Edit</Link> */}
                     <Link to={`/SubblogUpdate/${subblog._id}`} className="btn btn-sm btn-primary">
                       Edit
                     </Link>
+                    <button
+                      className="btn btn-sm btn-danger mx-1"
+                      onClick={() => handleDelete(subblog?.categoryId?._id, subblog._id)}
+                    >
+                      Delete
+                    </button>
                   </div>
                 </td>
               </tr>

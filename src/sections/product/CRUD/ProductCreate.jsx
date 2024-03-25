@@ -1,16 +1,102 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React, { useState } from 'react';
+import axios from 'axios';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import Select from 'react-select';
+import React, { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import { Container } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useDispatch } from 'react-redux';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { MultiSelect } from 'react-multi-select-component';
 
 import { addProduct } from './ProductReducer';
 
+const baseUrl = import.meta.env.VITE_BASE_API_URL;
+const token = localStorage.getItem('userToken');
+
+const customStyles = {
+  control: (provided, state) => ({
+    ...provided,
+    backgroundColor: 'white',
+    color: 'black',
+    border: '1px solid #ccc',
+    borderRadius: '5px',
+    '&:hover': { borderColor: 'blue' },
+  }),
+  // Add more style properties as needed
+};
 function ProductCreate() {
   // eslint-disable-next-line eqeqeq, no-debugger
+
+  const [categoryOptions, setCategoryOptions] = useState([]);
+  const [brandOptions, setBrandOptions] = useState([]);
+  const [subCategoryOptions, setSubCategoryOptions] = useState([]);
+
+  useEffect(() => {
+    const fetchCategoryOptions = async () => {
+      try {
+        const res = await axios.get(`${baseUrl}/category`, {
+          headers: {
+            Authorization: token,
+          },
+        });
+        const Options = res.data.categories.map((category) => ({
+          label: category.name,
+          value: category._id,
+        }));
+        console.log(Options);
+        setCategoryOptions(Options);
+      } catch (error) {
+        console.error('Error fetching category options:', error);
+      }
+    };
+    const fetchBrandOptions = async () => {
+      try {
+        const res = await axios.get(`${baseUrl}/brand`, {
+          headers: {
+            Authorization: token,
+          },
+        });
+        const Options = res.data.brand.map((brand) => ({
+          label: brand.name,
+          value: brand._id,
+        }));
+        console.log(Options);
+        setBrandOptions(Options);
+      } catch (error) {
+        console.error('Error fetching category options:', error);
+        console.error('Error fetching brand options:', error);
+      }
+    };
+
+    fetchCategoryOptions();
+    fetchBrandOptions();
+  }, []);
+
+  const handleCategoryChange = async (selectedOption) => {
+    console.log(selectedOption);
+    setSelectedCategory(selectedOption);
+    const res = await axios.get(`${baseUrl}/category/${selectedCategory.value}/subcategory`, {
+      headers: {
+        Authorization: token,
+      },
+    });
+    const Options = res.data.subCategories.map((subcategory) => ({
+      label: subcategory.name,
+      value: subcategory._id,
+    }));
+    console.log(Options);
+    setSubCategoryOptions(Options);
+  };
+  const handleBrandChange = (selectedOption) => {
+    console.log(selectedOption);
+    setSelectedBrand(selectedOption);
+  };
+  const handleSubCategoryChange = (selectedOption) => {
+    console.log(selectedOption);
+    setSelectedSubCategory(selectedOption);
+  };
 
   const colorOptions = [
     { label: 'Red', value: 'red' },
@@ -37,11 +123,14 @@ function ProductCreate() {
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [uprice, setPrice] = useState('');
   const [ustock, setStock] = useState('');
-  const [ucategoryId, setCategoryId] = useState('');
-  const [ubrandId, setBrandId] = useState('');
-  const [usubCategoryId, setSubCategoryId] = useState('');
+  const [uDescription, setDescription] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedBrand, setSelectedBrand] = useState(null);
+  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
   const [udiscount, setDiscount] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+
+  console.log(selectedColors);
 
   const dispatch = useDispatch();
 
@@ -51,9 +140,10 @@ function ProductCreate() {
     subImages: uSubImages,
     price: uprice,
     stock: ustock,
-    brandId: ubrandId,
-    categoryId: ucategoryId,
-    subCategoryId: usubCategoryId,
+    brandId: selectedBrand,
+    categoryId: selectedCategory,
+    subCategoryId: selectedSubCategory,
+    description: uDescription,
     discount: udiscount,
     sizes: selectedSizes.map((item) => item.value),
     colors: selectedColors.map((item) => item.value),
@@ -63,7 +153,7 @@ function ProductCreate() {
     event.preventDefault();
     dispatch(addProduct(productToCreate)).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
-        setSuccessMessage('category has been updated successfully!');
+        setSuccessMessage('product has been created successfully!');
         setTimeout(() => {
           setSuccessMessage('');
         }, 3000);
@@ -101,8 +191,23 @@ function ProductCreate() {
                 id="name"
                 name="name"
                 className="form-control"
+                required
                 value={uname}
                 onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+
+            <div>
+              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+              <label htmlFor="description">Description:</label>
+              <textarea
+                type="txtar"
+                required
+                id="description"
+                name="description"
+                className="form-control"
+                value={uDescription}
+                onChange={(e) => setDescription(e.target.value)}
               />
             </div>
 
@@ -113,6 +218,7 @@ function ProductCreate() {
                 type="file"
                 id="primImg"
                 name="primImg"
+                required
                 className="form-control"
                 onChange={(e) => setPrimImg(e.target.files[0])}
               />
@@ -123,6 +229,7 @@ function ProductCreate() {
               <input
                 type="file"
                 id="subImages"
+                required
                 name="subImages"
                 className="form-control"
                 multiple // Allows multiple file selection
@@ -136,6 +243,7 @@ function ProductCreate() {
               <input
                 type="number"
                 id="price"
+                required
                 name="price"
                 className="form-control"
                 value={uprice}
@@ -150,6 +258,7 @@ function ProductCreate() {
                 type="number"
                 id="stock"
                 name="stock"
+                required
                 className="form-control"
                 value={ustock}
                 onChange={(e) => setStock(e.target.value)}
@@ -157,38 +266,50 @@ function ProductCreate() {
             </div>
 
             <div>
-              <label htmlFor="categoryId">Category ID:</label>
-              <input
-                type="text"
-                id="categoryId"
-                name="categoryId"
-                className="form-control"
-                value={ucategoryId}
-                onChange={(e) => setCategoryId(e.target.value)}
+              <label htmlFor="category">Category :</label>
+              <Select
+                value={selectedCategory}
+                required
+                options={categoryOptions}
+                onChange={handleCategoryChange}
+                styles={{
+                  option: (base) => ({
+                    ...base,
+                    color: 'black',
+                  }),
+                }}
               />
             </div>
-
             <div>
-              <label htmlFor="subCategoryId">Sub-Category ID:</label>
-              <input
-                type="text"
-                id="subCategoryId"
-                name="subCategoryId"
-                className="form-control"
-                value={usubCategoryId}
-                onChange={(e) => setSubCategoryId(e.target.value)}
+              <label htmlFor="SubCategory">SubCategory :</label>
+              <Select
+                defaultValue={subCategoryOptions[0]}
+                value={selectedSubCategory}
+                required
+                options={subCategoryOptions}
+                onChange={handleSubCategoryChange}
+                styles={{
+                  option: (base) => ({
+                    ...base,
+                    color: 'black',
+                  }),
+                }}
               />
             </div>
-
             <div>
-              <label htmlFor="brandId">Brand ID:</label>
-              <input
-                type="text"
-                id="brandId"
-                name="brandId"
-                className="form-control"
-                value={ubrandId}
-                onChange={(e) => setBrandId(e.target.value)}
+              <label htmlFor="brand">Brand :</label>
+              <Select
+                defaultValue={brandOptions[0]}
+                required
+                value={selectedBrand}
+                options={brandOptions}
+                onChange={handleBrandChange}
+                styles={{
+                  option: (base) => ({
+                    ...base,
+                    color: 'black',
+                  }),
+                }}
               />
             </div>
 
@@ -199,6 +320,7 @@ function ProductCreate() {
                 type="number"
                 id="discount"
                 name="discount"
+                required
                 className="form-control"
                 value={udiscount}
                 onChange={(e) => setDiscount(e.target.value)}
@@ -208,29 +330,45 @@ function ProductCreate() {
             <div>
               {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
               <label htmlFor="size">Sizes:</label>
-              <MultiSelect
+              <Select
+                isMulti
                 options={sizeOptions}
+                required
                 value={selectedSizes}
                 onChange={setSelectedSizes}
                 labelledBy="Select"
+                styles={{
+                  option: (base) => ({
+                    ...base,
+                    color: 'black',
+                  }),
+                }}
               />
             </div>
 
             <div>
               {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
               <label htmlFor="color">Colors:</label>
-              <MultiSelect
+              <Select
+                isMulti
                 options={colorOptions}
                 value={selectedColors}
+                required
                 onChange={setSelectedColors}
                 labelledBy="Select"
+                styles={{
+                  option: (base) => ({
+                    ...base,
+                    color: 'black',
+                  }),
+                }}
               />
             </div>
 
             <br />
 
             <button type="submit" className="btn btn-info">
-              Update
+              Create
             </button>
           </form>
         </div>

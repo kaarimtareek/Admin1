@@ -1,5 +1,5 @@
 /* eslint-disable react/button-has-type */
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import React, { useEffect } from 'react';
 import { Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -9,7 +9,7 @@ import { Button } from '@mui/material';
 
 import Iconify from 'src/components/iconify/iconify';
 
-import { getCoupons } from './CoponReducer';
+import { deleteCoupon, getCoupons } from './CoponReducer';
 
 function CouponHome() {
   const couponState = useSelector((state) => state.coupons);
@@ -18,6 +18,7 @@ function CouponHome() {
   console.log(couponState);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (couponState.status === 'idle') {
@@ -25,6 +26,22 @@ function CouponHome() {
     }
   }, [couponState.status, dispatch]);
 
+  const handleDelete = (id) => {
+    // eslint-disable-next-line no-debugger
+    debugger;
+    console.log('Deleting blog with ID:', id);
+    dispatch(deleteCoupon(id)).then((res) => {
+      if (res.meta.requestStatus === 'fulfilled') {
+        alert('coupon has been deleted successfully!');
+      } else {
+        alert('an error has occured');
+      }
+    });
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+    navigate('/CoponHome');
+  };
 
   function convertUtcToLocal(utcTimeString) {
     const utcDate = new Date(utcTimeString);
@@ -66,6 +83,12 @@ function CouponHome() {
                     <Link to={`/CoponUpdate/${coupon._id}`} className="btn btn-sm btn-primary">
                       Edit
                     </Link>
+                    <button
+                      className="btn btn-sm btn-danger mx-1"
+                      onClick={() => handleDelete(coupon._id)}
+                    >
+                      Delete
+                    </button>
                   </div>
                 </td>
               </tr>

@@ -9,7 +9,7 @@ export const getsubBlogs = createAsyncThunk('subblogs/getsubBlogs', (id, { dispa
 });
 
 export const updateSubblog = createAsyncThunk(
-  'brands/updateSubblog',
+  'subblogs/updateSubblog',
   async ({ id, name, img }, { rejectWithValue }) => {
     const formData = new FormData();
     formData.append('name', name);
@@ -40,6 +40,36 @@ export const updateSubblog = createAsyncThunk(
       throw new Error(response.data);
     } catch (error) {
       return rejectWithValue(error);
+    }
+  }
+);
+
+export const deleteSubBlog = createAsyncThunk(
+  'brands/deleteSubBlog',
+  async ({ parentId, id }, { rejectWithValue }) => {
+    // eslint-disable-next-line no-debugger
+    debugger;
+    const headers = {
+      Authorization: token,
+    };
+
+    const config = {
+      method: 'delete',
+      url: `${baseUrl}/category/subcategories/delete/${id}`,
+      headers,
+    };
+
+    console.log(config);
+
+    // Send the request using Axios
+    try {
+      const response = await axios(config);
+      if (response.status === 200 || response.status === 201 || response.status === 202) {
+        return response.data;
+      }
+      throw new Error(response.data);
+    } catch (error) {
+      return rejectWithValue('error');
     }
   }
 );
@@ -117,40 +147,5 @@ const subblogSlice = createSlice({
   },
 });
 
-export const { deleteSubblog } = subblogSlice.actions;
 export const selectAllSubBlogs = (state) => state.subBlogs;
-
 export default subblogSlice.reducer;
-
-// import { createSlice } from "@reduxjs/toolkit";
-
-// import { blogList } from "./Data";
-
-// const blogSlice = createSlice({
-//     name: "blogs",
-//     initialState: blogList,
-//     reducers: {
-//         addBlog: (state, action) => {
-//             state.push(action.payload);
-//         },
-//         updateBlog: (state, action) => {
-//             const { id, name, img } = action.payload;
-//             const blogToUpdate = state.find(blog => blog.id === id);
-//             if (blogToUpdate) {
-//                 blogToUpdate.name = name;
-//                 blogToUpdate.img = img;
-//             }
-//         },
-//         deleteBlog: (state, action) => {
-//             const { id } = action.payload;
-//             // Modify the state directly
-//             const index = state.findIndex(blog => blog.id === id);
-//             if (index !== -1) {
-//                 state.splice(index, 1);
-//             }
-//         }
-//     }
-// });
-
-// export const { addBlog, updateBlog, deleteBlog } = blogSlice.actions;
-// export default blogSlice.reducer;
