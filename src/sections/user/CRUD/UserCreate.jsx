@@ -110,6 +110,12 @@ function UserCreate() {
               value={role}
               options={roleOptions}
               onChange={handleRoleChange}
+              styles={{
+                option: (base) => ({
+                  ...base,
+                  color: 'black',
+                }),
+              }}
             />
           </div>
           <br />
