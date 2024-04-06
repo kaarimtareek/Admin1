@@ -77,7 +77,7 @@ function ProductCreate() {
   const handleCategoryChange = async (selectedOption) => {
     console.log(selectedOption);
     setSelectedCategory(selectedOption);
-    const res = await axios.get(`${baseUrl}/category/${selectedCategory.value}/subcategory`, {
+    const res = await axios.get(`${baseUrl}/category/${selectedOption.value}/subcategory`, {
       headers: {
         Authorization: token,
       },
@@ -283,7 +283,6 @@ function ProductCreate() {
             <div>
               <label htmlFor="SubCategory">SubCategory :</label>
               <Select
-                defaultValue={subCategoryOptions[0]}
                 value={selectedSubCategory}
                 required
                 options={subCategoryOptions}
