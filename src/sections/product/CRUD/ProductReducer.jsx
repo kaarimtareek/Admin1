@@ -9,7 +9,7 @@ export const getProducts = createAsyncThunk('products/getProducts', async () => 
   return axios
     .get(`${baseUrl}/product`, {
       headers: {
-        Authorization: token,
+        Authorization: `Bearer ${token}`,
       },
     })
     .then((res) => res.data.products);
@@ -21,7 +21,8 @@ export const deleteProduct = createAsyncThunk(
     // eslint-disable-next-line no-debugger
     debugger;
     const headers = {
-      Authorization: token,
+      Authorization: `Bearer ${token}`
+,
     };
 
     const config = {
@@ -77,7 +78,8 @@ export const updateProduct = createAsyncThunk(
 
     const headers = {
       'Content-Type': 'multipart/form-data',
-      Authorization: token,
+      Authorization: `Bearer ${token}`
+,
     };
 
     const config = {
@@ -154,7 +156,8 @@ export const addProduct = createAsyncThunk(
 
     const headers = {
       'Content-Type': 'multipart/form-data',
-      Authorization: token,
+      Authorization: `Bearer ${token}`
+,
     };
 
     const config = {

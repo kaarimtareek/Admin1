@@ -1,7 +1,9 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
 
 import { updateBlog } from './BlogReducer';
 
@@ -26,6 +28,7 @@ function BlogUpdate() {
   }
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleUpdate = (event) => {
     event.preventDefault();
@@ -37,7 +40,8 @@ function BlogUpdate() {
       })
     ).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
-        setSuccessMessage('category has been updated successfully!');
+        toast.success('category has been updated successfully!');
+        navigate('/blog');
         setTimeout(() => {
           setSuccessMessage('');
         }, 3000);
@@ -47,7 +51,7 @@ function BlogUpdate() {
         errors.forEach((error) => {
           errorMessage += `${error.message}\n`;
         });
-        alert(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
+        toast.error(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
       }
     });
   };
@@ -88,6 +92,7 @@ function BlogUpdate() {
           </button>
         </form>
       </div>
+      <Toaster />
     </div>
   );
 }

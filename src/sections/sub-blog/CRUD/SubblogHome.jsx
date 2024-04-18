@@ -1,9 +1,11 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable react/button-has-type */
 import { Link, useNavigate } from 'react-router-dom';
 import React, { useEffect } from 'react';
 import { Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useDispatch, useSelector } from 'react-redux';
+import toast, { Toaster } from 'react-hot-toast';
 
 import { Button } from '@mui/material';
 
@@ -39,9 +41,9 @@ function SubblogHome() {
       // eslint-disable-next-line no-debugger
       debugger;
       if (res.meta.requestStatus === 'fulfilled') {
-        alert('subcategory has been deleted successfully!');
+        toast.success('subcategory has been deleted successfully!');
       } else {
-        alert('an error has occured');
+        toast.error('an error has occured');
       }
     });
     setTimeout(() => {
@@ -115,6 +117,7 @@ function SubblogHome() {
               </tr>
             ))}
         </tbody>
+        <Toaster />
       </table>
     );
   }

@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 // import { DatePicker } from 'react-datepicker';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import toast, { Toaster } from 'react-hot-toast';
 
 import { addCoupon } from './CoponReducer'; // Importing addBlog action creator from the reducer file
 
@@ -19,11 +20,11 @@ function CoponCreate() {
   const handleSubmit = (event) => {
     event.preventDefault();
     if (!name || !amount || !expireDate) {
-      alert('Please provide all data');
+      toast.error('Please provide all data');
       return;
     }
     if (amount > 100) {
-      alert('amount be less than or equal to 100');
+      toast.error('amount be less than or equal to 100');
       return;
     }
     const newCopon = {
@@ -36,17 +37,15 @@ function CoponCreate() {
 
     dispatch(addCoupon(newCopon)).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
-        setSuccessMessage('copon has been created successfully!');
-        setTimeout(() => {
-          setSuccessMessage('');
-        }, 3000);
+        toast.success('copon has been created successfully!');
+        navigate('/copon');
       } else {
         const errors = res.payload.response.data.details;
         let errorMessage = '';
         errors.forEach((error) => {
           errorMessage += `${error.message}\n`;
         });
-        alert(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
+        toast.error(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
       }
     });
 
@@ -105,6 +104,7 @@ function CoponCreate() {
           </button>
         </form>
       </div>
+      <Toaster />
     </div>
   );
 }

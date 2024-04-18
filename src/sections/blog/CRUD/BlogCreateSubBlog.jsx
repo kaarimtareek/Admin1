@@ -1,8 +1,10 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import toast, { Toaster } from 'react-hot-toast';
 
 import { addSubBlog } from 'src/sections/sub-blog/CRUD/SubblogReducer';
 
@@ -16,6 +18,7 @@ function BlogCreateSubBlog() {
   const [successMessage, setSuccessMessage] = useState('');
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -34,17 +37,15 @@ function BlogCreateSubBlog() {
 
     dispatch(addSubBlog(newSubBlog)).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
-        setSuccessMessage('a new  subcategory has been created successfully!');
-        setTimeout(() => {
-          setSuccessMessage('');
-        }, 3000);
+        toast.success('a new subcategory has been created successfully!');
+        navigate('/subblog');
       } else {
         const errors = res.payload.response.data.details;
         let errorMessage = '';
         errors.forEach((error) => {
           errorMessage += error.message;
         });
-        alert(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
+        toast.error(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
       }
     });
   };
@@ -102,6 +103,7 @@ function BlogCreateSubBlog() {
           </button>
         </form>
       </div>
+      <Toaster />
     </div>
   );
 }

@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
 
 import { userLogin } from './authReducer';
 
@@ -14,14 +15,14 @@ const LoginPage = () => {
   const handleLogin = () => {
     dispatch(userLogin({ email, password })).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
-        alert('succesful login');
+        toast.success('succesful login');
 
         localStorage.setItem('isLoggedIn', 'true'); // Store authentication state
         window.location.reload();
       } else {
         const errors = res.payload.response.data?.details;
         console.log(errors);
-        alert(`${res.payload.response.data.globalMessage}`);
+        toast.error(`${res.payload.response.data.globalMessage}`);
       }
     });
   };
@@ -66,6 +67,7 @@ const LoginPage = () => {
           </div>
         </div>
       </div>
+      <Toaster />
     </div>
   );
 };

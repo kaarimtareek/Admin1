@@ -1,9 +1,11 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
+import toast, { Toaster } from 'react-hot-toast';
 import { addUser } from 'src/sections/user/CRUD/UserReducer';
 
 function UserCreate() {
@@ -43,7 +45,10 @@ function UserCreate() {
     event.preventDefault();
     dispatch(addUser(newUser)).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
-        alert('user has been created successfully!');
+        toast.success('user has been created successfully!');
+        setTimeout(() => {
+          navigate('/user');
+        }, 1500);
       } else {
         alert(`${res.payload.response.data.globalMessage}`);
       }
@@ -124,6 +129,7 @@ function UserCreate() {
           </button>
         </form>
       </div>
+      <Toaster />
     </div>
   );
 }

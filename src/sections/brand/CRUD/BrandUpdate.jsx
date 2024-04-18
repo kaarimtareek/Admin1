@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
 
 import { updateBrand } from './BrandReducer';
 
@@ -21,7 +22,7 @@ function BrandUpdate() {
   const [successMessage, setSuccessMessage] = useState('');
 
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
   const handleUpdate = (e) => {
     e.preventDefault();
 
@@ -35,17 +36,15 @@ function BrandUpdate() {
       })
     ).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
-        setSuccessMessage('brand has been updated successfully!');
-        setTimeout(() => {
-          setSuccessMessage('');
-        }, 3000);
+        toast.success('brand has been updated successfully!');
+        navigate('/brand');
       } else {
         const errors = res.payload.response.data.details;
         let errorMessage = '';
         errors.forEach((error) => {
           errorMessage += error.message;
         });
-        alert(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
+        toast.error(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
       }
     });
   };
@@ -86,6 +85,7 @@ function BrandUpdate() {
           </button>
         </form>
       </div>
+      <Toaster />
     </div>
   );
 }

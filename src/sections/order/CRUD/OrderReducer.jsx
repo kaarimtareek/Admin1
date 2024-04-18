@@ -9,7 +9,7 @@ export const getOrders = createAsyncThunk('orders/getOrders', () => {
   return axios
     .get(`${baseUrl}/order/orders/All`, {
       headers: {
-        Authorization: token,
+        Authorization: `Bearer ${token}`,
       },
     })
     .then((res) => res.data.order);
@@ -20,7 +20,8 @@ export const rejectOrder = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     const headers = {
       'Content-Type': 'multipart/form-data',
-      Authorization: token,
+      Authorization: `Bearer ${token}`
+,
     };
 
     const config = {

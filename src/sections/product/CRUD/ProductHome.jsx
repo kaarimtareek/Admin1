@@ -1,6 +1,8 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable react/button-has-type */
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import toast, { Toaster } from 'react-hot-toast';
 import { Spinner } from 'react-bootstrap';
 
 import { Link, useNavigate } from 'react-router-dom';
@@ -45,9 +47,9 @@ function ProductHome() {
     console.log('Deleting blog with ID:', id);
     dispatch(deleteProduct(id)).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
-        alert('product has been deleted successfully!');
+        toast.success('product has been deleted successfully!');
       } else {
-        alert('an error has occured');
+        toast.error('an error has occured');
       }
     });
     setTimeout(() => {
@@ -143,6 +145,7 @@ function ProductHome() {
         Create
       </Button>
       {content}
+      <Toaster />
     </div>
   );
 }

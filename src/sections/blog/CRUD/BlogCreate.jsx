@@ -1,6 +1,8 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import toast, { Toaster } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -14,13 +16,14 @@ function BlogCreate() {
   const [successMessage, setSuccessMessage] = useState('');
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
     // Check if name and imgPreview are provided
     if (!name || !imgPreview) {
-      alert('Please provide a name and select an image.');
+      toast.error('Please provide a name and select an image.');
       return;
     }
 
@@ -31,17 +34,15 @@ function BlogCreate() {
 
     dispatch(addBlog(newBlog)).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
-        setSuccessMessage('category has been updated successfully!');
-        setTimeout(() => {
-          setSuccessMessage('');
-        }, 3000);
+        toast.success('category has been created successfully!');
+        navigate('/blog');
       } else {
         const errors = res.payload.response.data.details;
         let errorMessage = '';
         errors.forEach((error) => {
           errorMessage += `${error.message}\n`;
         });
-        alert(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
+        toast.error(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
       }
     });
   };
@@ -93,6 +94,7 @@ function BlogCreate() {
           </button>
         </form>
       </div>
+      <Toaster />
     </div>
   );
 }

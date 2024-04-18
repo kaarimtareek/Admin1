@@ -1,9 +1,11 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable react/button-has-type */
 import { Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import toast, { Toaster } from 'react-hot-toast';
 
 import { Button } from '@mui/material';
 
@@ -35,7 +37,7 @@ function BlogHome() {
     console.log('Deleting blog with ID:', id);
     dispatch(deleteBlog(id)).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
-        alert('Blog has been deleted successfully!');
+        toast.success('Blog has been deleted successfully!');
       } else {
         alert('an error has occured');
       }
@@ -121,6 +123,7 @@ function BlogHome() {
               </tr>
             ))}
         </tbody>
+        <Toaster />
       </table>
     );
   }

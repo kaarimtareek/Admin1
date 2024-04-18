@@ -14,7 +14,7 @@ export const deleteBrand = createAsyncThunk(
   'brands/deleteBrand',
   async (id, { rejectWithValue }) => {
     const headers = {
-      Authorization: token,
+      Authorization: `Bearer ${token}`,
     };
 
     const config = {
@@ -51,7 +51,7 @@ export const updateBrand = createAsyncThunk(
 
     const headers = {
       'Content-Type': 'multipart/form-data', // Set the Content-Type header
-      Authorization: token, // Set the Authorization header
+      Authorization: `Bearer ${token}`,
     };
 
     const config = {
@@ -87,7 +87,7 @@ export const addBrand = createAsyncThunk(
 
     const headers = {
       'Content-Type': 'multipart/form-data',
-      Authorization: token,
+      Authorization: `Bearer ${token}`,
     };
 
     const config = {

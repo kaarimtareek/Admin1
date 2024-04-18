@@ -1,7 +1,9 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useDispatch, useSelector } from 'react-redux';
+import toast, { Toaster } from 'react-hot-toast';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import { updateUser } from './UserReducer';
@@ -36,9 +38,12 @@ function UserUpdate() {
     // Pass updated user data to the updateUser function
     dispatch(updateUser(userToBeUpdated)).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
-        alert('User has been updated successfully!');
+        toast.success('User has been updated successfully!');
+        setTimeout(() => {
+          navigate('/user');
+        }, 1500);
       } else {
-        alert(`${res.payload.response.data.globalMessage}`);
+        toast.error(`${res.payload.response.data.globalMessage}`);
       }
     });
   };
@@ -103,6 +108,7 @@ function UserUpdate() {
           </button>
         </form>
       </div>
+      <Toaster />
     </div>
   );
 }
