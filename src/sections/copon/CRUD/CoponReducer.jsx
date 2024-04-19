@@ -12,7 +12,7 @@ export const deleteCoupon = createAsyncThunk(
   'brands/deleteCoupon',
   async (id, { rejectWithValue }) => {
     const headers = {
-      Authorization: token,
+      Authorization: `Bearer ${token}`,
     };
 
     // eslint-disable-next-line no-debugger
@@ -48,7 +48,8 @@ export const updateCoupon = createAsyncThunk(
 
     const headers = {
       'Content-Type': 'multipart/form-data', // Set the Content-Type header
-      Authorization: token, // Set the Authorization header
+      Authorization: `Bearer ${token}`,
+      // Set the Authorization header
     };
 
     // Define request configuration object
@@ -83,7 +84,8 @@ export const addCoupon = createAsyncThunk(
 
     const headers = {
       'Content-Type': 'multipart/form-data',
-      Authorization: token,
+      Authorization: `Bearer ${token}`
+,
     };
 
     const config = {

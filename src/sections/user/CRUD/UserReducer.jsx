@@ -9,7 +9,7 @@ export const getUsers = createAsyncThunk('users/getUsers', () => {
   return axios
     .get(`${baseUrl}/user/getAllUsers`, {
       headers: {
-        Authorization: token,
+        Authorization: `Bearer ${token}`,
       },
     })
     .then((res) => res.data.users);
@@ -20,7 +20,8 @@ export const updateUser = createAsyncThunk(
   async (updatedUser, { rejectWithValue }) => {
     const headers = {
       'Content-Type': 'application/json',
-      Authorization: token,
+      Authorization: `Bearer ${token}`
+,
     };
     // eslint-disable-next-line no-debugger
     debugger;
@@ -61,7 +62,8 @@ export const updateUser = createAsyncThunk(
 export const addUser = createAsyncThunk('brands/addUser', async (newUser, { rejectWithValue }) => {
   const headers = {
     'Content-Type': 'application/json',
-    Authorization: token,
+    Authorization: `Bearer ${token}`
+,
   };
   // eslint-disable-next-line no-debugger
   debugger;

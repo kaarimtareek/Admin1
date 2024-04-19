@@ -4,6 +4,7 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import toast, { Toaster } from 'react-hot-toast';
 
 import { Spinner } from 'react-bootstrap';
 import { Button } from '@mui/material';
@@ -33,9 +34,9 @@ function BrandHome() {
     console.log('Deleting blog with ID:', id);
     dispatch(deleteBrand(id)).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
-        alert('brand has been deleted successfully!');
+        toast.success('brand has been deleted successfully!');
       } else {
-        alert('an error has occured');
+        toast.error('an error has occured');
       }
     });
     setTimeout(() => {
@@ -108,6 +109,7 @@ function BrandHome() {
               </tr>
             ))}
         </tbody>
+        <Toaster />
       </table>
     );
   }

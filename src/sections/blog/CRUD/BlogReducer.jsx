@@ -11,7 +11,7 @@ export const getBlogs = createAsyncThunk('blogs/getBlogs', () => {
   return axios
     .get(`${baseUrl}/category`, {
       headers: {
-        Authorization: token,
+        Authorization: `Bearer ${token}`,
       },
     })
     .then((res) => res.data.categories);
@@ -28,7 +28,7 @@ export const updateBlog = createAsyncThunk(
 
     const headers = {
       'Content-Type': 'multipart/form-data',
-      Authorization: token,
+      Authorization: `Bearer ${token}`,
     };
 
     const config = {
@@ -53,33 +53,30 @@ export const updateBlog = createAsyncThunk(
   }
 );
 
-export const deleteBlog = createAsyncThunk(
-  'blogs/deleteBlog',
-  async (id , { rejectWithValue }) => {
-    const headers = {
-      Authorization: token,
-    };
+export const deleteBlog = createAsyncThunk('blogs/deleteBlog', async (id, { rejectWithValue }) => {
+  const headers = {
+    Authorization: `Bearer ${token}`,
+  };
 
-    const config = {
-      method: 'delete',
-      url: `${baseUrl}/category/${id}`,
-      headers
-    };
+  const config = {
+    method: 'delete',
+    url: `${baseUrl}/category/${id}`,
+    headers,
+  };
 
-    console.log(config);
+  console.log(config);
 
-    // Send the request using Axios
-    try {
-      const response = await axios(config);
-      if (response.status === 200 || response.status === 201 || response.status === 202) {
-        return response.data;
-      }
-      throw new Error(response.data);
-    } catch (error) {
-      return rejectWithValue(error);
+  // Send the request using Axios
+  try {
+    const response = await axios(config);
+    if (response.status === 200 || response.status === 201 || response.status === 202) {
+      return response.data;
     }
+    throw new Error(response.data);
+  } catch (error) {
+    return rejectWithValue(error);
   }
-);
+});
 
 export const addSubBlog = createAsyncThunk(
   'blogs/addSubblog',
@@ -90,7 +87,7 @@ export const addSubBlog = createAsyncThunk(
 
     const headers = {
       'Content-Type': 'multipart/form-data',
-      Authorization: token,
+      Authorization: `Bearer ${token}`,
     };
 
     const config = {
@@ -125,7 +122,7 @@ export const addBlog = createAsyncThunk(
 
     const headers = {
       'Content-Type': 'multipart/form-data',
-      Authorization: token,
+      Authorization: `Bearer ${token}`,
     };
 
     const config = {
@@ -191,7 +188,6 @@ const blogSlice = createSlice({
     });
   },
 });
-
 
 export const selectAllBlogs = (state) => state.blogs;
 export default blogSlice.reducer;

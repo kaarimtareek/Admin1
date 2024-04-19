@@ -6,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import toast, { Toaster } from 'react-hot-toast';
 
 import Iconify from 'src/components/iconify/iconify';
 
@@ -21,7 +22,7 @@ const baseUrl = import.meta.env.VITE_BASE_API_URL;
 
 //   const headers = {
 //     'Content-Type': 'multipart/form-data',
-//     Authorization: token,
+//     Authorization: `Bearer ${token}`
 //   };
 
 //   const config = {
@@ -64,13 +65,13 @@ function OrderHome() {
     dispatch(rejectOrder(id))
       .then((res) => {
         if (res.meta.requestStatus === 'fulfilled') {
-          alert('order has been rejected successfully');
+          toast.success('order has been rejected successfully');
         } else {
-          alert(res.payload.response.data.globalMessage);
+          toast.error(res.payload.response.data.globalMessage);
         }
       })
       .catch((err) => {
-        alert(err);
+        toast.error(err);
       });
   };
 
@@ -127,6 +128,7 @@ function OrderHome() {
               </tr>
             ))}
         </tbody>
+        <Toaster />
       </table>
     );
   }

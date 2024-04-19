@@ -1,11 +1,13 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import axios from 'axios';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import Select from 'react-select';
+import toast, { Toaster } from 'react-hot-toast';
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Container } from 'react-bootstrap';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { MultiSelect } from 'react-multi-select-component';
@@ -38,7 +40,7 @@ function ProductCreate() {
       try {
         const res = await axios.get(`${baseUrl}/category`, {
           headers: {
-            Authorization: token,
+            Authorization: `Bearer ${token}`,
           },
         });
         const Options = res.data.categories.map((category) => ({
@@ -55,7 +57,7 @@ function ProductCreate() {
       try {
         const res = await axios.get(`${baseUrl}/brand`, {
           headers: {
-            Authorization: token,
+            Authorization: `Bearer ${token}`,
           },
         });
         const Options = res.data.brand.map((brand) => ({
@@ -79,7 +81,7 @@ function ProductCreate() {
     setSelectedCategory(selectedOption);
     const res = await axios.get(`${baseUrl}/category/${selectedOption.value}/subcategory`, {
       headers: {
-        Authorization: token,
+        Authorization: `Bearer ${token}`,
       },
     });
     const Options = res.data.subCategories.map((subcategory) => ({
@@ -149,21 +151,23 @@ function ProductCreate() {
     colors: selectedColors.map((item) => item.value),
   };
 
+  const navigate = useNavigate();
+
   const handleUpdate = (event) => {
     event.preventDefault();
     dispatch(addProduct(productToCreate)).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
-        setSuccessMessage('product has been created successfully!');
-        setTimeout(() => {
-          setSuccessMessage('');
-        }, 3000);
+        toast.success('product has been created successfully!', {
+          duration: 5000,
+        });
+        navigate('/products');
       } else {
         const errors = res.payload.response.data.details;
         let errorMessage = '';
         errors.forEach((error) => {
           errorMessage += `${error.message}\n`;
         });
-        alert(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
+        toast.error(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
       }
     });
   };

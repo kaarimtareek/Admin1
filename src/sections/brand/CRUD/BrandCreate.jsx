@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import toast, { Toaster } from 'react-hot-toast';
 
 import { addBrand } from './BrandReducer'; // Importing addBlog action creator from the reducer file
 
@@ -32,17 +33,15 @@ function BrandCreate() {
 
     dispatch(addBrand(newBrand)).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
-        setSuccessMessage('brand has been created successfully!');
-        setTimeout(() => {
-          setSuccessMessage('');
-        }, 3000);
+        toast.success('brand has been created successfully!');
+        navigate('/brand');
       } else {
         const errors = res.payload.response.data.details;
         let errorMessage = '';
         errors.forEach((error) => {
           errorMessage += error.message;
         });
-        alert(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
+        toast.error(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
       }
     });
   };
@@ -94,6 +93,7 @@ function BrandCreate() {
           </button>
         </form>
       </div>
+      <Toaster />
     </div>
   );
 }

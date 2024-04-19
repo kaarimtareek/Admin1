@@ -19,7 +19,7 @@ export const updateSubblog = createAsyncThunk(
 
     const headers = {
       'Content-Type': 'multipart/form-data',
-      Authorization: token,
+      Authorization: `Bearer ${token}`,
     };
 
     const config = {
@@ -50,7 +50,8 @@ export const deleteSubBlog = createAsyncThunk(
     // eslint-disable-next-line no-debugger
     debugger;
     const headers = {
-      Authorization: token,
+      Authorization: `Bearer ${token}`
+,
     };
 
     const config = {
@@ -83,7 +84,8 @@ export const addSubBlog = createAsyncThunk(
 
     const headers = {
       'Content-Type': 'multipart/form-data',
-      Authorization: token,
+      Authorization: `Bearer ${token}`
+,
     };
 
     const config = {

@@ -1,3 +1,4 @@
+import toast, { Toaster } from 'react-hot-toast';
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,6 +22,7 @@ function CoponUpdate() {
   const [successMessage, setSuccessMessage] = useState('');
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleUpdate = (event) => {
     event.preventDefault();
@@ -32,17 +34,15 @@ function CoponUpdate() {
       })
     ).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
-        setSuccessMessage('coupon has been updated successfully!');
-        setTimeout(() => {
-          setSuccessMessage('');
-        }, 3000);
+        toast.success('coupon has been updated successfully!');
+        navigate('/copon');
       } else {
         const errors = res.payload.response.data.details;
         let errorMessage = '';
         errors.forEach((error) => {
           errorMessage += `${error.message}\n`;
         });
-        alert(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
+        toast.error(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
       }
     });
   };
@@ -83,6 +83,7 @@ function CoponUpdate() {
           </button>
         </form>
       </div>
+      <Toaster />
     </div>
   );
 }

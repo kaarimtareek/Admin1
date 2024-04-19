@@ -1,7 +1,9 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useDispatch, useSelector } from 'react-redux';
+import toast, { Toaster } from 'react-hot-toast';
 
 import { updateSubblog } from './SubblogReducer';
 
@@ -22,6 +24,7 @@ function SubblogUpdate() {
   const [successMessage, setSuccessMessage] = useState('');
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleUpdate = (event) => {
     event.preventDefault();
@@ -33,17 +36,15 @@ function SubblogUpdate() {
       })
     ).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
-        setSuccessMessage('subcategory has been updated successfully!');
-        setTimeout(() => {
-          setSuccessMessage('');
-        }, 3000);
+        toast.success('subcategory has been updated successfully!');
+        navigate('/subblog');
       } else {
         const errors = res.payload.response.data.details;
         let errorMessage = '';
         errors.forEach((error) => {
           errorMessage += error.message;
         });
-        alert(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
+        toast.error(`${res.payload.response.data.globalMessage}\n${errorMessage}`);
       }
     });
   };
@@ -85,6 +86,7 @@ function SubblogUpdate() {
           </button>
         </form>
       </div>
+      <Toaster />
     </div>
   );
 }
