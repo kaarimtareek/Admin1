@@ -33,7 +33,7 @@ function BlogHome() {
 
   const handleDelete = (id) => {
     // eslint-disable-next-line no-debugger
-    debugger;
+     
     console.log('Deleting blog with ID:', id);
     dispatch(deleteBlog(id)).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {

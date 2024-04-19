@@ -30,7 +30,7 @@ function BrandHome() {
   const [img, setImage] = useState(null);
   const handleDelete = (id) => {
     // eslint-disable-next-line no-debugger
-    debugger;
+     
     console.log('Deleting blog with ID:', id);
     dispatch(deleteBrand(id)).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {

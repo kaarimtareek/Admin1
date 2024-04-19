@@ -29,7 +29,7 @@ function CouponHome() {
 
   const handleDelete = (id) => {
     // eslint-disable-next-line no-debugger
-    debugger;
+     
     console.log('Deleting blog with ID:', id);
     dispatch(deleteCoupon(id)).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {

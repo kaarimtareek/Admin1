@@ -16,9 +16,10 @@ const LoginPage = () => {
     dispatch(userLogin({ email, password })).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
         toast.success('succesful login');
+       
 
         localStorage.setItem('isLoggedIn', 'true'); // Store authentication state
-        window.location.reload();
+       window.location.reload();
       } else {
         const errors = res.payload.response.data?.details;
         console.log(errors);

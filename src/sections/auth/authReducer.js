@@ -24,12 +24,15 @@ export const userLogin = createAsyncThunk(
     try {
       const response = await axios(config);
       if (response.status === 200 || response.status === 201 || response.status === 202) {
+       
         localStorage.setItem('userToken', `${response.data.token}`);
         dispatch(authSlice.actions.loginSuccess()); // dispatch action to update login state
         return response.data;
       }
+    
       throw new Error(response.data);
     } catch (error) {
+    
       return rejectWithValue(error);
     }
   }

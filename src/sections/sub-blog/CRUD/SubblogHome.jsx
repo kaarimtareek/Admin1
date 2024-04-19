@@ -39,7 +39,7 @@ function SubblogHome() {
     console.log('Deleting blog with ID:', id);
     dispatch(deleteSubBlog({ parentId, id })).then((res) => {
       // eslint-disable-next-line no-debugger
-      debugger;
+       
       if (res.meta.requestStatus === 'fulfilled') {
         toast.success('subcategory has been deleted successfully!');
       } else {
