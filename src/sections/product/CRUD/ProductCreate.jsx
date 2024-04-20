@@ -233,7 +233,7 @@ function ProductCreate() {
               <input
                 type="file"
                 id="subImages"
-                required
+                
                 name="subImages"
                 className="form-control"
                 multiple // Allows multiple file selection
@@ -323,7 +323,7 @@ function ProductCreate() {
                 type="number"
                 id="discount"
                 name="discount"
-                required
+                
                 className="form-control"
                 value={udiscount}
                 onChange={(e) => setDiscount(e.target.value)}
