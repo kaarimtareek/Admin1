@@ -248,6 +248,12 @@ function ProductUpdate() {
                 value={selectedSizes}
                 onChange={setSelectedSizes}
                 labelledBy="Select"
+                styles={{
+                  option: (base) => ({
+                    ...base,
+                    color: 'black',
+                  }),
+                }}
               />
             </div>
 
