@@ -1,26 +1,25 @@
 /* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable react/button-has-type */
-import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import toast, { Toaster } from 'react-hot-toast';
-import { Spinner } from 'react-bootstrap';
-
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Button } from '@mui/material';
 
 import Iconify from 'src/components/iconify/iconify';
 
-import { deleteProduct, getProducts } from './ProductReducer';
+import { getProducts, deleteProduct } from './ProductReducer';
 
 function ProductHome() {
   const productsState = useSelector((state) => state.products);
-  console.log(productsState);
   const dispatch = useDispatch();
-  const [primImg, setPrimImage] = useState(null);
+  const [, setPrimImage] = useState(null);
 
-  const navigate = useNavigate();
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage] = useState(10); // Change this as needed
 
   useEffect(() => {
     if (productsState.status === 'idle') {
@@ -42,57 +41,51 @@ function ProductHome() {
   };
 
   const handleDelete = (id) => {
-    // eslint-disable-next-line no-debugger
-     
-    console.log('Deleting blog with ID:', id);
+    console.log('Deleting product with ID:', id);
     dispatch(deleteProduct(id)).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
-        toast.success('product has been deleted successfully!');
+        toast.success('Product has been deleted successfully!');
       } else {
-        toast.error('an error has occured');
+        toast.error('An error has occurred');
       }
     });
-    setTimeout(() => {
-      window.location.reload();
-    }, 3000);
-    navigate('/ProductHome');
   };
 
   let content;
   if (productsState.loading) {
-    // eslint-disable-next-line react/jsx-no-undef
-    content = <Spinner text="loading" />;
+    content = <Spinner text="Loading" />;
   } else if (productsState.status === 'rejected') {
-    content = <h2> error in fetching data {productsState.error}</h2>;
+    content = <h2>Error in fetching data {productsState.error}</h2>;
   } else {
     const { products } = productsState;
-    console.log(products);
+
+    // Pagination logic
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
+
     content = (
-      <table className="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Image</th>
-            <th>Price</th>
-            <th>Stock</th>
-            <th>Category</th>
-            <th>SubCategory</th>
-            <th>Brand</th>
-            {/* <th>Discount</th>
-            <th>Sizes</th>
-            <th>Colors</th> */}
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products &&
-            products.map((product) => (
+      <>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Image</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>Category</th>
+              <th>SubCategory</th>
+              <th>Brand</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentProducts.map((product) => (
               <tr key={product._id}>
                 <td>{product._id}</td>
                 <td>{product.name}</td>
                 <td>
-                  {/* Display uploaded image or placeholder */}
                   {product.mainImage ? (
                     <img
                       src={product.mainImage.secure_url}
@@ -108,16 +101,13 @@ function ProductHome() {
                 <td>{product.categoryId?.name}</td>
                 <td>{product.subCategoryId?.name}</td>
                 <td>{product.brandId?.name}</td>
-                {/* <td>{product.discount}</td>
-                <td>{product.size.join(', ')}</td>
-                <td>{product.colors.join(', ')}</td> */}
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    {/* <Link to={`/BlogUpdate/${blogList.id}`} className='btn btn-sm btn-primary'>Edit</Link> */}
                     <Link to={`/ProductUpdate/${product._id}`} className="btn btn-sm btn-primary">
                       Edit
                     </Link>
                     <button
+                      type="button"
                       className="btn btn-sm btn-danger mx-1"
                       onClick={() => handleDelete(product._id)}
                     >
@@ -127,8 +117,50 @@ function ProductHome() {
                 </td>
               </tr>
             ))}
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+
+        {/* Pagination */}
+        <div className="pagination" style={{ gap: '3px' }}>
+          <button
+            style={{ gap: '20px' }}
+            type="button"
+            onClick={() => setCurrentPage(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          {Array.from({ length: Math.ceil(products.length / productsPerPage) }, (_, i) => (
+            <button
+              style={{
+                borderTopLeftRadius: '5px',
+                borderBottomLeftRadius: '5px',
+                borderTopRightRadius: '5px',
+                borderBottomRightRadius: '5px',
+                padding: '10px',
+                marginRight: '5px',
+                transition: 'background-color 0.3s ease',
+                backgroundColor: currentPage === i + 1 ? '#224f34' : 'transparent',
+                color: currentPage === i + 1 ? 'white' : 'black',
+              }}
+              type="button"
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={currentPage === i + 1 ? 'active' : ''}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            style={{ gap: '20px' }}
+            type="button"
+            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={currentPage === Math.ceil(products.length / productsPerPage)}
+          >
+            Next
+          </button>
+        </div>
+      </>
     );
   }
 

@@ -1,12 +1,12 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import toast, { Toaster } from 'react-hot-toast';
+import axios from 'axios';
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useState } from 'react';
 import { Container } from 'react-bootstrap';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import toast, { Toaster } from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams, useNavigate } from 'react-router-dom';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { MultiSelect } from 'react-multi-select-component';
 
@@ -59,7 +59,7 @@ function ProductUpdate() {
     { label: 'XXX-Large', value: 'xxx-large' },
   ];
 
-  const { name, price, stock, categoryId, subCategoryId, brandId, discount } = product;
+  const { name, price, stock, discount } = product;
 
   const [uname, setName] = useState(name);
   const [uprimImg, setPrimImg] = useState(null);
@@ -72,7 +72,7 @@ function ProductUpdate() {
   // const [ubrandId, setBrandId] = useState(brandId._id);
   // const [usubCategoryId, setSubCategoryId] = useState(subCategoryId._id);
   const [udiscount, setDiscount] = useState(discount);
-  const [successMessage, setSuccessMessage] = useState('');
+  const [successMessage] = useState('');
 
   console.log(selectedSizes);
   console.log(selectedColors);
@@ -248,12 +248,6 @@ function ProductUpdate() {
                 value={selectedSizes}
                 onChange={setSelectedSizes}
                 labelledBy="Select"
-                styles={{
-                  option: (base) => ({
-                    ...base,
-                    color: 'black',
-                  }),
-                }}
               />
             </div>
 

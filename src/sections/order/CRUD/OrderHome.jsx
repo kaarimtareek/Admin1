@@ -1,53 +1,17 @@
 /* eslint-disable react/button-has-type */
-import axios from 'axios';
-import { reject } from 'lodash';
 import { Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import toast, { Toaster } from 'react-hot-toast';
-
-import Iconify from 'src/components/iconify/iconify';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { getOrders, rejectOrder } from './OrderReducer';
 
-const baseUrl = import.meta.env.VITE_BASE_API_URL;
-
-// const rejectOrder = async (id) => {
-//   // eslint-disable-next-line no-debugger
-//
-
-//   const token = localStorage.getItem('userToken');
-
-//   const headers = {
-//     'Content-Type': 'multipart/form-data',
-//     Authorization: `Bearer ${token}`
-//   };
-
-//   const config = {
-//     method: 'patch',
-//     url: `${baseUrl}/order/${id}/rejected`,
-//     headers,
-//   };
-
-//   console.log(config);
-
-//   try {
-//     const response = await axios(config);
-//     console.log(response);
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
-
 function OrderHome() {
   const ordersState = useSelector((state) => state.orders);
-
-  console.log(`order state`);
-  console.log(ordersState);
-
   const dispatch = useDispatch();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [ordersPerPage] = useState(10); // Change this as needed
 
   function convertUtcToLocal(utcTimeString) {
     const utcDate = new Date(utcTimeString);
@@ -65,7 +29,7 @@ function OrderHome() {
     dispatch(rejectOrder(id))
       .then((res) => {
         if (res.meta.requestStatus === 'fulfilled') {
-          toast.success('order has been rejected successfully');
+          toast.success('Order has been rejected successfully');
         } else {
           toast.error(res.payload.response.data.globalMessage);
         }
@@ -77,31 +41,35 @@ function OrderHome() {
 
   let content;
   if (ordersState.loading) {
-    // eslint-disable-next-line react/jsx-no-undef
-    content = <Spinner text="loading" />;
+    content = <Spinner text="Loading" />;
   } else if (ordersState.status === 'rejected') {
-    content = <h2> error in fetching data {ordersState.error}</h2>;
+    content = <h2>Error in fetching data {ordersState.error}</h2>;
   } else {
     const { orders } = ordersState;
-    console.log(orders);
+
+    // Pagination logic
+    const indexOfLastOrder = currentPage * ordersPerPage;
+    const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+    const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+
     content = (
-      <table className="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>User Id</th>
-            <th>Address</th>
-            <th>Phone</th>
-            <th>Payment Type</th>
-            <th>Final Price</th>
-            <th>Status</th>
-            <th>Created At</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders &&
-            orders.map((order) => (
+      <>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>User Id</th>
+              <th>Address</th>
+              <th>Phone</th>
+              <th>Payment Type</th>
+              <th>Final Price</th>
+              <th>Status</th>
+              <th>Created At</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentOrders.map((order) => (
               <tr key={order._id}>
                 <td>{order._id}</td>
                 <td>{order.userId}</td>
@@ -113,10 +81,6 @@ function OrderHome() {
                 <td>{convertUtcToLocal(order.createdAt)}</td>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    {/* <Link to={`/OrderUpdate/${order._id}`} className="btn btn-sm btn-primary">
-                      Edit
-                    </Link> */}
-
                     <button
                       onClick={() => handleRejection(order._id)}
                       className="btn btn-sm btn-danger ms-2"
@@ -127,9 +91,50 @@ function OrderHome() {
                 </td>
               </tr>
             ))}
-        </tbody>
+          </tbody>
+        </table>
+        {/* Pagination */}
+        <div className="pagination" style={{ gap: '3px' }}>
+          <button
+            style={{ gap: '20px' }}
+            type="button"
+            onClick={() => setCurrentPage(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          {Array.from({ length: Math.ceil(orders.length / ordersPerPage) }, (_, i) => (
+            <button
+              style={{
+                borderTopLeftRadius: '5px',
+                borderBottomLeftRadius: '5px',
+                borderTopRightRadius: '5px',
+                borderBottomRightRadius: '5px',
+                padding: '10px',
+                marginRight: '5px',
+                transition: 'background-color 0.3s ease',
+                backgroundColor: currentPage === i + 1 ? '#224f34' : 'transparent',
+                color: currentPage === i + 1 ? 'white' : 'black',
+              }}
+              type="button"
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={currentPage === i + 1 ? 'active' : ''}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            style={{ gap: '20px' }}
+            type="button"
+            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={currentPage === Math.ceil(orders.length / ordersPerPage)}
+          >
+            Next
+          </button>
+        </div>
         <Toaster />
-      </table>
+      </>
     );
   }
 

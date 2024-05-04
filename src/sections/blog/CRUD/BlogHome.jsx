@@ -2,10 +2,10 @@
 /* eslint-disable react/button-has-type */
 import { Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import toast, { Toaster } from 'react-hot-toast';
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import toast, { Toaster } from 'react-hot-toast';
 
 import { Button } from '@mui/material';
 
@@ -15,11 +15,10 @@ import { getBlogs, deleteBlog } from './BlogReducer';
 
 function BlogHome() {
   const blogsState = useSelector((state) => state.blogs);
-
-  console.log(`blog state`);
-  console.log(blogsState);
-
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [blogsPerPage] = useState(10); // Change this as needed
 
   useEffect(() => {
     if (blogsState.status === 'idle') {
@@ -27,25 +26,22 @@ function BlogHome() {
     }
   }, [blogsState.status, dispatch]);
 
-  const navigate = useNavigate();
   // eslint-disable-next-line no-unused-vars
   const [img, setImage] = useState(null);
 
   const handleDelete = (id) => {
-    // eslint-disable-next-line no-debugger
-     
     console.log('Deleting blog with ID:', id);
     dispatch(deleteBlog(id)).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
         toast.success('Blog has been deleted successfully!');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+        navigate('/BlogHome');
       } else {
-        alert('an error has occured');
+        alert('An error has occurred');
       }
     });
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
-    navigate('/BlogHome');
   };
 
   const handleImageUpload = (event) => {
@@ -63,26 +59,30 @@ function BlogHome() {
 
   let content;
   if (blogsState.loading) {
-    // eslint-disable-next-line react/jsx-no-undef
-    content = <Spinner text="loading" />;
+    content = <Spinner text="Loading" />;
   } else if (blogsState.status === 'rejected') {
-    content = <h2> error in fetching data {blogsState.error}</h2>;
+    content = <h2>Error in fetching data {blogsState.error}</h2>;
   } else {
     const { blogs } = blogsState;
-    console.log(blogs);
+
+    // Pagination logic
+    const indexOfLastBlog = currentPage * blogsPerPage;
+    const indexOfFirstBlog = indexOfLastBlog - blogsPerPage;
+    const currentBlogs = blogs.slice(indexOfFirstBlog, indexOfLastBlog);
+
     content = (
-      <table className="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Image</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {blogs &&
-            blogs.map((blog) => (
+      <>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Image</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentBlogs.map((blog) => (
               <tr key={blog._id}>
                 <td>{blog._id}</td>
                 <td>{blog.name}</td>
@@ -96,13 +96,6 @@ function BlogHome() {
                 </td>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    {/* <Link to={`/BlogUpdate/${blogList.id}`} className='btn btn-sm btn-primary'>Edit</Link> */}
-                    {/* <Link
-                      to={`/BlogShowSubCategories/${blog._id}`}
-                      className="btn btn-sm btn-primary mx-1"
-                    >
-                      Show SubCategories
-                    </Link> */}
                     <Link
                       to={`/BlogCreateSubCategory/${blog._id}`}
                       className="btn btn-sm btn-primary mx-1"
@@ -122,9 +115,50 @@ function BlogHome() {
                 </td>
               </tr>
             ))}
-        </tbody>
+          </tbody>
+        </table>
+        {/* Pagination */}
+        <div className="pagination" style={{ gap: '3px' }}>
+          <button
+            style={{ gap: '20px' }}
+            type="button"
+            onClick={() => setCurrentPage(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          {Array.from({ length: Math.ceil(blogs.length / blogsPerPage) }, (_, i) => (
+            <button
+              style={{
+                borderTopLeftRadius: '5px',
+                borderBottomLeftRadius: '5px',
+                borderTopRightRadius: '5px',
+                borderBottomRightRadius: '5px',
+                padding: '10px',
+                marginRight: '5px',
+                transition: 'background-color 0.3s ease',
+                backgroundColor: currentPage === i + 1 ? '#224f34' : 'transparent',
+                color: currentPage === i + 1 ? 'white' : 'black',
+              }}
+              type="button"
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={currentPage === i + 1 ? 'active' : ''}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            style={{ gap: '20px' }}
+            type="button"
+            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={currentPage === Math.ceil(blogs.length / blogsPerPage)}
+          >
+            Next
+          </button>
+        </div>
         <Toaster />
-      </table>
+      </>
     );
   }
 

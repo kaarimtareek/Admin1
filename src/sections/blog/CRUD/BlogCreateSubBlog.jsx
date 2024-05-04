@@ -2,9 +2,9 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useParams, Link, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import toast, { Toaster } from 'react-hot-toast';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 
 import { addSubBlog } from 'src/sections/sub-blog/CRUD/SubblogReducer';
 
@@ -15,7 +15,7 @@ function BlogCreateSubBlog() {
   // eslint-disable-next-line no-unused-vars
   const [img, setImg] = useState(null); // State to store the selected image file
   const [imgPreview, setImgPreview] = useState(null); // State to store the base64 image preview
-  const [successMessage, setSuccessMessage] = useState('');
+  const [successMessage] = useState('');
 
   const dispatch = useDispatch();
   const navigate = useNavigate();

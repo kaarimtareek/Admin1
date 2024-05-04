@@ -1,9 +1,9 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useDispatch, useSelector } from 'react-redux';
 import toast, { Toaster } from 'react-hot-toast';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import { updateSubblog } from './SubblogReducer';
 
@@ -21,7 +21,7 @@ function SubblogUpdate() {
 
   const [uname, setName] = useState(name);
   const [uimg, setImg] = useState(null);
-  const [successMessage, setSuccessMessage] = useState('');
+  const [successMessage] = useState('');
 
   const dispatch = useDispatch();
   const navigate = useNavigate();

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import toast, { Toaster } from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
-import toast, { Toaster } from 'react-hot-toast';
 
 import { updateBrand } from './BrandReducer';
 
@@ -19,7 +19,7 @@ function BrandUpdate() {
 
   const [uname, setName] = useState(name);
   const [uimg, setImg] = useState(null);
-  const [successMessage, setSuccessMessage] = useState('');
+  const [successMessage] = useState('');
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
