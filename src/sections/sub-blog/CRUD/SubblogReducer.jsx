@@ -48,7 +48,7 @@ export const deleteSubBlog = createAsyncThunk(
   'brands/deleteSubBlog',
   async ({ parentId, id }, { rejectWithValue }) => {
     // eslint-disable-next-line no-debugger
-    debugger;
+     
     const headers = {
       Authorization: `Bearer ${token}`
 ,

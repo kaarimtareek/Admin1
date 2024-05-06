@@ -1,27 +1,20 @@
 /* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable react/button-has-type */
-import { Link, useNavigate } from 'react-router-dom';
-import React, { useEffect } from 'react';
 import { Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useDispatch, useSelector } from 'react-redux';
 import toast, { Toaster } from 'react-hot-toast';
+import React, { useState, useEffect } from 'react';
+/* eslint-disable react/button-has-type */
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { Button } from '@mui/material';
-
-import Iconify from 'src/components/iconify/iconify';
-
-import { deleteSubBlog, getsubBlogs } from './SubblogReducer';
+import { getsubBlogs, deleteSubBlog } from './SubblogReducer';
 
 function SubblogHome() {
-  // eslint-disable-next-line no-debugger
-
   const subBlogsState = useSelector((state) => state.subBlogs);
-
-  console.log(`sub-blog state`);
-  console.log(subBlogsState);
-
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [subBlogsPerPage] = useState(10); // Change this as needed
 
   useEffect(() => {
     if (subBlogsState.status === 'idle') {
@@ -29,27 +22,19 @@ function SubblogHome() {
     }
   }, [subBlogsState.status, dispatch]);
 
-  const navigate = useNavigate();
-
   const handleDelete = (parentId, id) => {
-    // if (parentId === undefined) {
-    //   alert('you cannot delete this subcategory');
-    //   return;
-    // }
-    console.log('Deleting blog with ID:', id);
+    console.log('Deleting sub-blog with ID:', id);
     dispatch(deleteSubBlog({ parentId, id })).then((res) => {
-      // eslint-disable-next-line no-debugger
-      debugger;
       if (res.meta.requestStatus === 'fulfilled') {
-        toast.success('subcategory has been deleted successfully!');
+        toast.success('Subcategory has been deleted successfully!');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+        navigate('/SubBlogHome');
       } else {
-        toast.error('an error has occured');
+        toast.error('An error has occurred');
       }
     });
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
-    navigate('/SubBlogHome');
   };
 
   const handleImageUpload = (event) => {
@@ -63,27 +48,31 @@ function SubblogHome() {
 
   let content;
   if (subBlogsState.loading) {
-    // eslint-disable-next-line react/jsx-no-undef
-    content = <Spinner text="loading" />;
+    content = <Spinner text="Loading" />;
   } else if (subBlogsState.status === 'rejected') {
-    content = <h2> error in fetching data {subBlogsState.error}</h2>;
+    content = <h2>Error in fetching data {subBlogsState.error}</h2>;
   } else {
     const { subBlogs } = subBlogsState;
-    console.log(subBlogs);
+
+    // Pagination logic
+    const indexOfLastSubBlog = currentPage * subBlogsPerPage;
+    const indexOfFirstSubBlog = indexOfLastSubBlog - subBlogsPerPage;
+    const currentSubBlogs = subBlogs.slice(indexOfFirstSubBlog, indexOfLastSubBlog);
+
     content = (
-      <table className="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Image</th>
-            <th>Parent Category</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {subBlogs &&
-            subBlogs.map((subblog) => (
+      <>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Image</th>
+              <th>Parent Category</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentSubBlogs.map((subblog) => (
               <tr key={subblog._id}>
                 <td>{subblog._id}</td>
                 <td>{subblog.name}</td>
@@ -102,7 +91,6 @@ function SubblogHome() {
                 <td>{subblog?.categoryId?.name}</td>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    {/* <Link to={`/BlogUpdate/${blogList.id}`} className='btn btn-sm btn-primary'>Edit</Link> */}
                     <Link to={`/SubblogUpdate/${subblog._id}`} className="btn btn-sm btn-primary">
                       Edit
                     </Link>
@@ -116,9 +104,50 @@ function SubblogHome() {
                 </td>
               </tr>
             ))}
-        </tbody>
+          </tbody>
+        </table>
+        {/* Pagination */}
+        <div className="pagination" style={{ gap: '3px' }}>
+          <button
+            style={{ gap: '20px' }}
+            type="button"
+            onClick={() => setCurrentPage(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          {Array.from({ length: Math.ceil(subBlogs.length / subBlogsPerPage) }, (_, i) => (
+            <button
+              style={{
+                borderTopLeftRadius: '5px',
+                borderBottomLeftRadius: '5px',
+                borderTopRightRadius: '5px',
+                borderBottomRightRadius: '5px',
+                padding: '10px',
+                marginRight: '5px',
+                transition: 'background-color 0.3s ease',
+                backgroundColor: currentPage === i + 1 ? '#224f34' : 'transparent',
+                color: currentPage === i + 1 ? 'white' : 'black',
+              }}
+              type="button"
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={currentPage === i + 1 ? 'active' : ''}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            style={{ gap: '20px' }}
+            type="button"
+            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={currentPage === Math.ceil(subBlogs.length / subBlogsPerPage)}
+          >
+            Next
+          </button>
+        </div>
         <Toaster />
-      </table>
+      </>
     );
   }
 

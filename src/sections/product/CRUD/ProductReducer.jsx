@@ -20,7 +20,7 @@ export const deleteProduct = createAsyncThunk(
   'products/deleteProduct',
   async (id, { rejectWithValue }) => {
     // eslint-disable-next-line no-debugger
-    debugger;
+     
     const headers = {
       Authorization: `Bearer ${token}`,
     };
@@ -124,7 +124,7 @@ export const addProduct = createAsyncThunk(
     { rejectWithValue }
   ) => {
     // eslint-disable-next-line no-debugger
-    debugger;
+     
     const formData = new FormData();
     formData.append('name', name);
     formData.append('description', description);

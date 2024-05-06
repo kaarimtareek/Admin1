@@ -16,7 +16,7 @@ export const deleteCoupon = createAsyncThunk(
     };
 
     // eslint-disable-next-line no-debugger
-    debugger;
+     
     const config = {
       method: 'delete',
       url: `${baseUrl}/coupon/${id}`,
@@ -25,7 +25,7 @@ export const deleteCoupon = createAsyncThunk(
 
     console.log(config);
     // eslint-disable-next-line no-debugger
-    debugger;
+     
 
     // Send the request using Axios
     try {

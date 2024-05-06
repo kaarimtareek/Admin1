@@ -1,10 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import toast, { Toaster } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import toast, { Toaster } from 'react-hot-toast';
 
 import { addBlog } from './BlogReducer'; // Importing addBlog action creator from the reducer file
 
@@ -13,7 +13,7 @@ function BlogCreate() {
   // eslint-disable-next-line no-unused-vars
   const [img, setImg] = useState(null); // State to store the selected image file
   const [imgPreview, setImgPreview] = useState(null); // State to store the base64 image preview
-  const [successMessage, setSuccessMessage] = useState('');
+  const [successMessage] = useState('');
 
   const dispatch = useDispatch();
   const navigate = useNavigate();

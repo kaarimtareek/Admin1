@@ -1,9 +1,9 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import 'bootstrap/dist/css/bootstrap.min.css';
 // import { DatePicker } from 'react-datepicker';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import toast, { Toaster } from 'react-hot-toast';
 
 import { addCoupon } from './CoponReducer'; // Importing addBlog action creator from the reducer file
@@ -12,7 +12,7 @@ function CoponCreate() {
   const [name, setName] = useState('');
   const [amount, setAmount] = useState(0);
   const [expireDate, setExpireDate] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [successMessage] = useState('');
 
   const dispatch = useDispatch();
   const navigate = useNavigate();

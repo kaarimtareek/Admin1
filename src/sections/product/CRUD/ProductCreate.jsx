@@ -3,31 +3,19 @@
 import axios from 'axios';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import Select from 'react-select';
-import toast, { Toaster } from 'react-hot-toast';
-import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 import { Container } from 'react-bootstrap';
-import { useParams, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { MultiSelect } from 'react-multi-select-component';
 
 import { addProduct } from './ProductReducer';
 
 const baseUrl = import.meta.env.VITE_BASE_API_URL;
 const token = localStorage.getItem('userToken');
 
-const customStyles = {
-  control: (provided, state) => ({
-    ...provided,
-    backgroundColor: 'white',
-    color: 'black',
-    border: '1px solid #ccc',
-    borderRadius: '5px',
-    '&:hover': { borderColor: 'blue' },
-  }),
-  // Add more style properties as needed
-};
 function ProductCreate() {
   // eslint-disable-next-line eqeqeq, no-debugger
 
@@ -130,7 +118,7 @@ function ProductCreate() {
   const [selectedBrand, setSelectedBrand] = useState(null);
   const [selectedSubCategory, setSelectedSubCategory] = useState(null);
   const [udiscount, setDiscount] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [successMessage] = useState('');
 
   console.log(selectedColors);
 
@@ -233,7 +221,7 @@ function ProductCreate() {
               <input
                 type="file"
                 id="subImages"
-                required
+                
                 name="subImages"
                 className="form-control"
                 multiple // Allows multiple file selection
@@ -323,7 +311,7 @@ function ProductCreate() {
                 type="number"
                 id="discount"
                 name="discount"
-                required
+                
                 className="form-control"
                 value={udiscount}
                 onChange={(e) => setDiscount(e.target.value)}

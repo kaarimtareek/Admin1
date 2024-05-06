@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { jwtDecode } from 'jwt-decode';
 // eslint-disable-next-line no-debugger
-debugger;
+ 
 
 const account = {
   displayName: 'temp',

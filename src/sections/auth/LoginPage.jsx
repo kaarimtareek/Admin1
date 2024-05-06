@@ -10,15 +10,17 @@ const LoginPage = () => {
   const dispatch = useDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  // eslint-disable-next-line no-unused-vars
   const navigate = useNavigate();
 
   const handleLogin = () => {
     dispatch(userLogin({ email, password })).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
         toast.success('succesful login');
+       
 
         localStorage.setItem('isLoggedIn', 'true'); // Store authentication state
-        window.location.reload();
+       window.location.reload();
       } else {
         const errors = res.payload.response.data?.details;
         console.log(errors);
