@@ -25,7 +25,7 @@ export const deleteBrand = createAsyncThunk(
 
     console.log(config);
     // eslint-disable-next-line no-debugger
-    debugger;
+     
 
     // Send the request using Axios
     try {

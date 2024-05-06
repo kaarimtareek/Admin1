@@ -1,9 +1,9 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import toast, { Toaster } from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
-import toast, { Toaster } from 'react-hot-toast';
 
 import { updateBlog } from './BlogReducer';
 

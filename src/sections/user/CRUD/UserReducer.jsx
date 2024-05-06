@@ -24,7 +24,7 @@ export const updateUser = createAsyncThunk(
 ,
     };
     // eslint-disable-next-line no-debugger
-    debugger;
+     
     const { id } = updatedUser;
     const { userName, mobileNumber, DOB } = updatedUser;
     const body = {};
@@ -66,7 +66,7 @@ export const addUser = createAsyncThunk('brands/addUser', async (newUser, { reje
 ,
   };
   // eslint-disable-next-line no-debugger
-  debugger;
+   
 
   const config = {
     method: 'post',

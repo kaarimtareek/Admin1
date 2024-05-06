@@ -1,81 +1,72 @@
 /* eslint-disable react/button-has-type */
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import toast, { Toaster } from 'react-hot-toast';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import toast, { Toaster } from 'react-hot-toast';
 
-import { Spinner } from 'react-bootstrap';
 import { Button } from '@mui/material';
 
 import Iconify from 'src/components/iconify/iconify';
 
-import { deleteBrand, getBrands } from './BrandReducer';
+import { getBrands, deleteBrand } from './BrandReducer';
 
 function BrandHome() {
   const brandState = useSelector((state) => state.brands);
-  console.log(`brand state`);
-  console.log(brandState);
-
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [brandsPerPage] = useState(10); // Change this as needed
+
   useEffect(() => {
     if (brandState.status === 'idle') {
       dispatch(getBrands());
     }
   }, [brandState.status, dispatch]);
 
-  const navigate = useNavigate();
-  // eslint-disable-next-line no-unused-vars
-  const [img, setImage] = useState(null);
   const handleDelete = (id) => {
-    // eslint-disable-next-line no-debugger
-    debugger;
-    console.log('Deleting blog with ID:', id);
+    console.log('Deleting brand with ID:', id);
     dispatch(deleteBrand(id)).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
-        toast.success('brand has been deleted successfully!');
+        toast.success('Brand has been deleted successfully!');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+        navigate('/BrandHome');
       } else {
-        toast.error('an error has occured');
+        toast.error('An error has occurred');
       }
     });
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
-    navigate('/BrandHome');
   };
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    const reader = new FileReader();
 
-    reader.onloadend = () => {
-      setImage(reader.result);
-    };
-
-    if (file) {
-      reader.readAsDataURL(file);
-    }
-  };
   let content;
 
   if (brandState.loading) {
-    content = <Spinner text="loading" />;
+    content = <Spinner text="Loading" />;
   } else if (brandState.status === 'rejected') {
-    content = <h2> error in fetching data {brandState.error}</h2>;
+    content = <h2>Error in fetching data {brandState.error}</h2>;
   } else {
+    const { brands } = brandState;
+
+    // Pagination logic
+    const indexOfLastBrand = currentPage * brandsPerPage;
+    const indexOfFirstBrand = indexOfLastBrand - brandsPerPage;
+    const currentBrands = brands.slice(indexOfFirstBrand, indexOfLastBrand);
+
     content = (
-      <table className="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Image</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {brandState.brands &&
-            brandState.brands.map((brand) => (
+      <>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Image</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentBrands.map((brand) => (
               <tr key={brand._id}>
                 <td>{brand._id}</td>
                 <td>{brand.name}</td>
@@ -88,13 +79,11 @@ function BrandHome() {
                       style={{ maxWidth: '100px' }}
                     />
                   ) : (
-                    // <img src={brand.img} alt="Uploaded" style={{ maxWidth: '100px' }} />
                     <div>No Image</div>
                   )}
                 </td>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    {/* <Link to={`/BlogUpdate/${blogList.id}`} className='btn btn-sm btn-primary'>Edit</Link> */}
                     <Link to={`/BrandUpdate/${brand._id}`} className="btn btn-sm btn-primary">
                       Edit
                     </Link>
@@ -108,12 +97,53 @@ function BrandHome() {
                 </td>
               </tr>
             ))}
-        </tbody>
+          </tbody>
+        </table>
+        {/* Pagination */}
+        <div className="pagination" style={{ gap: '3px' }}>
+          <button
+            style={{ gap: '20px' }}
+            type="button"
+            onClick={() => setCurrentPage(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          {Array.from({ length: Math.ceil(brands.length / brandsPerPage) }, (_, i) => (
+            <button
+              style={{
+                borderTopLeftRadius: '5px',
+                borderBottomLeftRadius: '5px',
+                borderTopRightRadius: '5px',
+                borderBottomRightRadius: '5px',
+                padding: '10px',
+                marginRight: '5px',
+                transition: 'background-color 0.3s ease',
+                backgroundColor: currentPage === i + 1 ? '#224f34' : 'transparent',
+                color: currentPage === i + 1 ? 'white' : 'black',
+              }}
+              type="button"
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={currentPage === i + 1 ? 'active' : ''}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            style={{ gap: '20px' }}
+            type="button"
+            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={currentPage === Math.ceil(brands.length / brandsPerPage)}
+          >
+            Next
+          </button>
+        </div>
         <Toaster />
-      </table>
+      </>
     );
   }
-  console.log(brandState.brands);
+
   return (
     <div className="container">
       <h2>Brands</h2>
@@ -126,10 +156,6 @@ function BrandHome() {
       >
         Create
       </Button>
-      {/* Display the wide screen screenshot using brands.img */}
-      {/* {brands && brands.length > 0 && (
-        <img src={brands[0].img} alt="Wide Screen Screenshot" style={{ width: '100%' }} />
-      )} */}
       {content}
     </div>
   );

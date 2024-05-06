@@ -2,8 +2,8 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useDispatch, useSelector } from 'react-redux';
 import toast, { Toaster } from 'react-hot-toast';
+import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import { updateUser } from './UserReducer';
@@ -19,7 +19,7 @@ function UserUpdate() {
   const [uname, setName] = useState(existingUser.userName);
   const [mobile, setMobile] = useState(existingUser.mobileNumber || '');
   const [dob, setDOB] = useState(existingUser.DOB || '');
-  const email = existingUser.email;
+  const {email} = existingUser;
 
   const dispatch = useDispatch();
   const navigate = useNavigate();

@@ -1,11 +1,13 @@
 import { Suspense } from 'react';
 import { createRoot } from 'react-dom/client'; // Correct import
-import { Provider, useSelector } from 'react-redux';
+import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import { configureStore } from '@reduxjs/toolkit';
 import { HelmetProvider } from 'react-helmet-async';
 
 import App from './app';
+import LoginPage from './sections/auth/LoginPage';
+import authReducer from './sections/auth/authReducer';
 import UserReducer from './sections/user/CRUD/UserReducer';
 import BlogReducer from './sections/blog/CRUD/BlogReducer';
 import BrandReducer from './sections/brand/CRUD/BrandReducer';
@@ -13,8 +15,6 @@ import CoponReducer from './sections/copon/CRUD/CoponReducer';
 import OrderReducer from './sections/order/CRUD/OrderReducer';
 import ProductReducer from './sections/product/CRUD/ProductReducer';
 import SubblogReducer from './sections/sub-blog/CRUD/SubblogReducer';
-import LoginPage from './sections/auth/LoginPage';
-import authReducer from './sections/auth/authReducer';
 
 const store = configureStore({
   reducer: {

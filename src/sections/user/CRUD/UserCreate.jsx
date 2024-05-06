@@ -1,11 +1,12 @@
 /* eslint-disable import/no-extraneous-dependencies */
+import Select from 'react-select';
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import Select from 'react-select';
 import toast, { Toaster } from 'react-hot-toast';
+
 import { addUser } from 'src/sections/user/CRUD/UserReducer';
 
 function UserCreate() {
@@ -15,7 +16,6 @@ function UserCreate() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [role, setRole] = useState(null);
-  const users = useSelector((state) => state.users);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 

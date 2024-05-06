@@ -1,6 +1,6 @@
-import toast, { Toaster } from 'react-hot-toast';
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import toast, { Toaster } from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 
@@ -19,7 +19,7 @@ function CoponUpdate() {
   const { name, amount } = coupon;
   const [uname, setName] = useState(name);
   const [uamount, setAmount] = useState(amount);
-  const [successMessage, setSuccessMessage] = useState('');
+  const [successMessage] = useState('');
 
   const dispatch = useDispatch();
   const navigate = useNavigate();

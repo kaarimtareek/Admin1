@@ -1,25 +1,23 @@
 /* eslint-disable react/button-has-type */
-import { Link, useNavigate } from 'react-router-dom';
-import React, { useEffect } from 'react';
 import { Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useDispatch, useSelector } from 'react-redux';
 import toast, { Toaster } from 'react-hot-toast';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { Button } from '@mui/material';
 
 import Iconify from 'src/components/iconify/iconify';
 
-import { deleteCoupon, getCoupons } from './CoponReducer';
+import { getCoupons, deleteCoupon } from './CoponReducer';
 
 function CouponHome() {
   const couponState = useSelector((state) => state.coupons);
-
-  console.log(`coupon state`);
-  console.log(couponState);
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [couponsPerPage] = useState(10); // Change this as needed
 
   useEffect(() => {
     if (couponState.status === 'idle') {
@@ -28,20 +26,18 @@ function CouponHome() {
   }, [couponState.status, dispatch]);
 
   const handleDelete = (id) => {
-    // eslint-disable-next-line no-debugger
-    debugger;
-    console.log('Deleting blog with ID:', id);
+    console.log('Deleting coupon with ID:', id);
     dispatch(deleteCoupon(id)).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
-        toast.success('coupon has been deleted successfully!');
+        toast.success('Coupon has been deleted successfully!');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+        navigate('/CoponHome');
       } else {
-        toast.error('an error has occured');
+        toast.error('An error has occurred');
       }
     });
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
-    navigate('/CoponHome');
   };
 
   function convertUtcToLocal(utcTimeString) {
@@ -52,27 +48,31 @@ function CouponHome() {
 
   let content;
   if (couponState.loading) {
-    // eslint-disable-next-line react/jsx-no-undef
-    content = <Spinner text="loading" />;
+    content = <Spinner text="Loading" />;
   } else if (couponState.status === 'rejected') {
-    content = <h2> error in fetching data {couponState.error}</h2>;
+    content = <h2>Error in fetching data {couponState.error}</h2>;
   } else {
     const { coupons } = couponState;
-    console.log(coupons);
+
+    // Pagination logic
+    const indexOfLastCoupon = currentPage * couponsPerPage;
+    const indexOfFirstCoupon = indexOfLastCoupon - couponsPerPage;
+    const currentCoupons = coupons.slice(indexOfFirstCoupon, indexOfLastCoupon);
+
     content = (
-      <table className="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Amount</th>
-            <th>Expire In</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {coupons &&
-            coupons.map((coupon) => (
+      <>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Amount</th>
+              <th>Expire In</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentCoupons.map((coupon) => (
               <tr key={coupon._id}>
                 <td>{coupon._id}</td>
                 <td>{coupon.name}</td>
@@ -80,7 +80,6 @@ function CouponHome() {
                 <td>{convertUtcToLocal(coupon.expireIn)}</td>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    {/* <Link to={`/CouponUpdate/${couponList.id}`} className='btn btn-sm btn-primary'>Edit</Link> */}
                     <Link to={`/CoponUpdate/${coupon._id}`} className="btn btn-sm btn-primary">
                       Edit
                     </Link>
@@ -94,9 +93,50 @@ function CouponHome() {
                 </td>
               </tr>
             ))}
-        </tbody>
+          </tbody>
+        </table>
+        {/* Pagination */}
+        <div className="pagination" style={{ gap: '3px' }}>
+          <button
+            style={{ gap: '20px' }}
+            type="button"
+            onClick={() => setCurrentPage(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          {Array.from({ length: Math.ceil(coupons.length / couponsPerPage) }, (_, i) => (
+            <button
+              style={{
+                borderTopLeftRadius: '5px',
+                borderBottomLeftRadius: '5px',
+                borderTopRightRadius: '5px',
+                borderBottomRightRadius: '5px',
+                padding: '10px',
+                marginRight: '5px',
+                transition: 'background-color 0.3s ease',
+                backgroundColor: currentPage === i + 1 ? '#224f34' : 'transparent',
+                color: currentPage === i + 1 ? 'white' : 'black',
+              }}
+              type="button"
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={currentPage === i + 1 ? 'active' : ''}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            style={{ gap: '20px' }}
+            type="button"
+            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={currentPage === Math.ceil(coupons.length / couponsPerPage)}
+          >
+            Next
+          </button>
+        </div>
         <Toaster />
-      </table>
+      </>
     );
   }
 
@@ -112,7 +152,6 @@ function CouponHome() {
       >
         Create
       </Button>
-
       {content}
     </div>
   );
