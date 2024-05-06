@@ -2,6 +2,7 @@ import axios from 'axios';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 const baseUrl = import.meta.env.VITE_BASE_API_URL;
+const modelUrl = import.meta.env.VITE_ML_API_URL;
 const token = localStorage.getItem('userToken');
 
 // eslint-disable-next-line arrow-body-style
@@ -21,8 +22,7 @@ export const deleteProduct = createAsyncThunk(
     // eslint-disable-next-line no-debugger
     debugger;
     const headers = {
-      Authorization: `Bearer ${token}`
-,
+      Authorization: `Bearer ${token}`,
     };
 
     const config = {
@@ -37,6 +37,7 @@ export const deleteProduct = createAsyncThunk(
     try {
       const response = await axios(config);
       if (response.status === 200 || response.status === 201 || response.status === 202) {
+        await removeProductFromMachineLearningModel(id);
         return response.data;
       }
       throw new Error(response.data);
@@ -78,8 +79,7 @@ export const updateProduct = createAsyncThunk(
 
     const headers = {
       'Content-Type': 'multipart/form-data',
-      Authorization: `Bearer ${token}`
-,
+      Authorization: `Bearer ${token}`,
     };
 
     const config = {
@@ -156,8 +156,7 @@ export const addProduct = createAsyncThunk(
 
     const headers = {
       'Content-Type': 'multipart/form-data',
-      Authorization: `Bearer ${token}`
-,
+      Authorization: `Bearer ${token}`,
     };
 
     const config = {
@@ -173,6 +172,11 @@ export const addProduct = createAsyncThunk(
     try {
       const response = await axios(config);
       if (response.status === 200 || response.status === 201 || response.status === 202) {
+        // eslint-disable-next-line no-debugger
+        debugger;
+        const productId = response.data.product._id;
+        const productImageUrl = response.data.product.mainImage.secure_url;
+        await addProductToMachineLearningModel(productId, productImageUrl);
         return response.data;
       }
       throw new Error(response.data);
@@ -181,6 +185,35 @@ export const addProduct = createAsyncThunk(
     }
   }
 );
+
+async function addProductToMachineLearningModel(product_id, product_url) {
+  try {
+    const formData = new FormData();
+    formData.append('id', product_id);
+    formData.append('image_url', product_url);
+    const response = await axios.post(`${modelUrl}/add-image`, formData, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
+    console.log(response.data);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function removeProductFromMachineLearningModel(product_id) {
+  try {
+    // eslint-disable-next-line no-debugger
+    debugger;
+    const formData = new FormData();
+    formData.append('id', product_id);
+    const response = await axios.post(`${modelUrl}/Delete-image`, formData);
+    console.log(response.data);
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 const initialState = {
   products: [],
