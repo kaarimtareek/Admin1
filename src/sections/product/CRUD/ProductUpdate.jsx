@@ -8,7 +8,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { MultiSelect } from 'react-multi-select-component';
+import Select from 'react-select';
 
 import { updateProduct } from './ProductReducer';
 
@@ -243,22 +243,36 @@ function ProductUpdate() {
             <div>
               {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
               <label htmlFor="size">Sizes:</label>
-              <MultiSelect
+              <Select
                 options={sizeOptions}
                 value={selectedSizes}
+                required
                 onChange={setSelectedSizes}
                 labelledBy="Select"
+                styles={{
+                  option: (base) => ({
+                    ...base,
+                    color: 'black',
+                  }),
+                }}
               />
             </div>
 
             <div>
               {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
               <label htmlFor="color">Colors:</label>
-              <MultiSelect
+              <Select
                 options={colorOptions}
                 value={selectedColors}
+                required
                 onChange={setSelectedColors}
                 labelledBy="Select"
+                styles={{
+                  option: (base) => ({
+                    ...base,
+                    color: 'black',
+                  }),
+                }}
               />
             </div>
 
