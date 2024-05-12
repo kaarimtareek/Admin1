@@ -1,6 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import axios from 'axios';
 /* eslint-disable jsx-a11y/label-has-associated-control */
+import Select from 'react-select';
 import React, { useState } from 'react';
 import { Container } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -8,7 +9,6 @@ import toast, { Toaster } from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import Select from 'react-select';
 
 import { updateProduct } from './ProductReducer';
 
@@ -59,13 +59,19 @@ function ProductUpdate() {
     { label: 'XXX-Large', value: 'xxx-large' },
   ];
 
-  const { name, price, stock, discount } = product;
+  const { name, price, stock, discount, colors, size } = product;
 
   const [uname, setName] = useState(name);
   const [uprimImg, setPrimImg] = useState(null);
   const [uSubImages, setSubImages] = useState([]);
-  const [selectedColors, setSelectedColors] = useState([]);
-  const [selectedSizes, setSelectedSizes] = useState([]);
+  const [selectedColors, setSelectedColors] = useState(
+    colors.map((color) =>
+      colors[color] ? { label: color, value: color } : { label: color, value: color }
+    )
+  );
+  const [selectedSizes, setSelectedSizes] = useState(
+    size.map((s) => (size[s] ? { label: s, value: s } : { label: s, value: s }))
+  );
   const [uprice, setPrice] = useState(price);
   const [ustock, setStock] = useState(stock);
   // const [ucategoryId, setCategoryId] = useState(categoryId.id);
@@ -247,6 +253,7 @@ function ProductUpdate() {
                 options={sizeOptions}
                 value={selectedSizes}
                 required
+                isMulti
                 onChange={setSelectedSizes}
                 labelledBy="Select"
                 styles={{
@@ -265,6 +272,7 @@ function ProductUpdate() {
                 options={colorOptions}
                 value={selectedColors}
                 required
+                isMulti
                 onChange={setSelectedColors}
                 labelledBy="Select"
                 styles={{
